@@ -4,7 +4,7 @@ import bcrypt
 
 class CreateUserGeneralSerializer(serializers.Serializer):
     password=serializers.CharField(required=True)
-    password2=serializers.CharField(required=False)
+    password2=serializers.CharField(required=True)
     first_name=serializers.CharField(required=False)
     last_name=serializers.CharField(required=False)
     middle_name=serializers.CharField(required=False)
@@ -46,7 +46,7 @@ class CreatePublicUserSerializer(CreateUserGeneralSerializer):
                 **validated_data
             )
         except Exception:
-            return
+            pass
         
         # send confirmation to email/phone if entered
         

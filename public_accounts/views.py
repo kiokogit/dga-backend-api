@@ -50,7 +50,7 @@ class PublicAccountsViewSet(GeneralView):
     
     @action(detail=False, methods=['GET'])
     def get_user_own_profile(self, request):
-        
+        """Get user complete details based on signed token"""
         user = self.get_logged_in_user(request)
         
         if user is None:
@@ -65,6 +65,7 @@ class PublicAccountsViewSet(GeneralView):
     
     @action(detail=False, methods=['GET'])
     def get_user_public_profile(self, request):
+        """Returns basic user profile, upon passing user_id param"""
         if not request.query_params.get('user_id'):
             return Response({"details": "User id is required"}, status=status.HTTP_400_BAD_REQUEST)
         user = self.get_user_by_id(request.query_params.get('user_id'))
