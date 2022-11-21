@@ -44,10 +44,6 @@ class UsersAccountsManagerViewSet(GeneralView):
         if not request.data.get('email'):
             return Response({"details": "Email field cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
         
-        exists, user = self.get_user_by_email(request.data.get('email'), request.data['user_type'])
-        if exists:
-            return Response({"details": "User with that email already exists"}, status=status.HTTP_400_BAD_REQUEST)
-        
         #serialized
         if request.data['user_type'] == 'PUBLIC USER':
             serializer = serializers.CreatePublicUserSerializer(
@@ -65,13 +61,16 @@ class UsersAccountsManagerViewSet(GeneralView):
             )
             
         if serializer.is_valid():
+            exists, user = self.get_user_by_email(request.data.get('email'), request.data['user_type'])
+            if exists:
+                return Response({"details": "User with that email already exists"}, status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
             
-            return Response({"details":"User created successfully. Proceed to login"}, status=status.HTTP_200_OK)
+            return Response({"details":"User created successfully."}, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
             # TODO: Format serializer errors to user friendliness
-            return Response({"details":"Error creating user"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"details":"Invalid data. Cannot create user"}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['POST'])
     def login_user(self, request):
@@ -80,12 +79,13 @@ class UsersAccountsManagerViewSet(GeneralView):
             data=request.data
         )
         if not serializer.is_valid():
-            return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            print(serializer.errors)
+            return Response({"details": "Invalid User Data"}, status=status.HTTP_400_BAD_REQUEST)
         
         # get user
         user_exists, user = self.get_user_by_email(request.data.get('email'), request.data.get('user_type'))
         if not user_exists or user is None:
-            return Response({"details": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"details": "Invalid Email/Password"}, status=status.HTTP_400_BAD_REQUEST)
         
         # check is password match
         encoded = request.data.get('password').encode('utf-8')
