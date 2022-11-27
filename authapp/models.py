@@ -66,7 +66,7 @@ class OrganizationAccount(BaseUserModel):
 # otp model
 class OTPVerification(BaseModelWithStatus):
     user=models.ForeignKey(UserModel, related_name="otp_verification", on_delete=models.CASCADE) 
-    status=models.CharField(max_length=255, null=True, blank=True)
+    verified=models.CharField(max_length=255, null=True, blank=True)
     otp_code=models.CharField(max_length=255, null=True, blank=True)
     mode=models.CharField(max_length=255, null=True, blank=True)
     

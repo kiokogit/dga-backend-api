@@ -98,7 +98,7 @@ class UsersAccountsManagerViewSet(GeneralView):
             "email": user.email,
             "user_type": user.user_type
         }
-        jwt_token = jwt.encode(payload=payload, key=settings.SECRET_KEY)
+        jwt_token = jwt.encode(payload=payload, key=settings.SECRET_KEY).decode("utf-8")
         # set headers
         headers = {
             "JWTAUTH":f'Bearer {jwt_token}'
