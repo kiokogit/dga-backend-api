@@ -22,9 +22,15 @@ class GeneralView(GenericViewSet):
             'Authorization':access_token
         }
     
-    def get_serializer_context(self):
+    def get_serializer_context(self, request):
+        headers = self.return_headers(request)
+        # decode jwt
+        payload = jwt.decode(headers['JWTAUTH'],key=settings.SECRET_KEY, algorithms=['HS256'])
+        
         context = {
-            "headers": self.return_headers
+            "user_id": payload['user_id'],
+            "user_type": payload['user_type'],
+            "headers":headers
         }
         return context
     
@@ -52,7 +58,8 @@ class UsersAccountsManagerViewSet(GeneralView):
             
         elif request.data['user_type'] == 'INTERNAL STAFF':
             serializer = serializers.CreateInternalStaffUserSerializer(
-                data=request.data
+                data=request.data,
+                context=self.get_serializer_context(request)
             )
         
         else:
@@ -112,5 +119,5 @@ class UsersAccountsManagerViewSet(GeneralView):
         # find user by email link sent
         pass
         
-        
+   
     

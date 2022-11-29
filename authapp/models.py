@@ -9,6 +9,18 @@ USER_TYPES = [
     ('ORGANIZATION', 'ORGANIZATION')
 ]
 
+ROLES = [
+    ("BOOKING MANAGER", "BOOKING MANAGER"),
+    ("FINANCE OFFICER", "FINANCE OFFICER"),
+    ("CUSTOMER CARE", "CUSTOMER CARE"),
+    ("ICT OFFICER", "ICT OFFICER"),
+    ("BOOKING OFFICER", "BOOKING OFFICER"),
+    ("GENERAL MANAGER", "GENERAL MANAGER"),
+    # ("OPERATIONS OFFICER", "OPERATIONS OFFICER"),
+    ("GENERAL STAFF", "GENERAL STAFF"),
+    ("SUPER USER", "SUPER USER")
+]
+
 
 # basic model
 class BaseModel(models.Model):
@@ -88,7 +100,7 @@ class ResidentialAddress(BaseModelWithStatus):
 # user roles
 class RolesModel(BaseModelWithStatus):
     user=models.ForeignKey(UserModel, related_name="roles", on_delete=models.CASCADE)
-    role=models.CharField(max_length=25)
+    role=models.CharField(max_length=25, choices=ROLES, default="GENERAL STAFF")
 
 # user contacts
 class ContactsModel(models.Model):
@@ -97,3 +109,4 @@ class ContactsModel(models.Model):
     is_phone_number_verified=models.BooleanField(default=False)
     alternative_phone_number=models.CharField(max_length=50, null=True, blank=True)
     is_alternative_phone_number_verified=models.BooleanField(default=False)
+
