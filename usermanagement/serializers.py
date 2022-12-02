@@ -46,4 +46,10 @@ class PublicUserDetailsSerializer(PublicUserBasicDetails):
             return address[0]
         else:
             return "No Entry"
-        
+
+class UserRolesSerializer(serializers.Serializer):
+    class Meta:
+        model = models.RolesModel
+        fields=[
+            "role"
+        ]

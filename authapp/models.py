@@ -1,26 +1,8 @@
 from datetime import timezone
 from django.db import models
 import uuid
+from .constants import USER_TYPES, ROLES
 # Create your models here.
-
-USER_TYPES = [
-    ('PUBLIC USER', 'PUBLIC USER'),
-    ('INTERNAL STAFF', 'INTERNAL STAFF'),
-    ('ORGANIZATION', 'ORGANIZATION')
-]
-
-ROLES = [
-    ("BOOKING MANAGER", "BOOKING MANAGER"),
-    ("FINANCE OFFICER", "FINANCE OFFICER"),
-    ("CUSTOMER CARE", "CUSTOMER CARE"),
-    ("ICT OFFICER", "ICT OFFICER"),
-    ("BOOKING OFFICER", "BOOKING OFFICER"),
-    ("GENERAL MANAGER", "GENERAL MANAGER"),
-    # ("OPERATIONS OFFICER", "OPERATIONS OFFICER"),
-    ("GENERAL STAFF", "GENERAL STAFF"),
-    ("SUPER USER", "SUPER USER")
-]
-
 
 # basic model
 class BaseModel(models.Model):
@@ -110,3 +92,8 @@ class ContactsModel(models.Model):
     alternative_phone_number=models.CharField(max_length=50, null=True, blank=True)
     is_alternative_phone_number_verified=models.BooleanField(default=False)
 
+class ProfessionalAccountsModel(BaseModelWithStatus):
+    user = models.ForeignKey(UserModel, related_name="professional_accounts", on_delete=models.CASCADE)
+    account_name = models.CharField(max_length=50, null=True, blank=True)
+    # account_role = models.CharField(max_length=50, null=True, blank=True)
+    upgraded_by = models.CharField(max_length=50, null=True, blank=True)

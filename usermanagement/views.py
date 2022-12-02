@@ -6,7 +6,7 @@ from rest_framework import status
 from app import settings
 from authapp.serializers import CreateUserGeneralSerializer
 
-from .serializers import PublicUserBasicDetails, PublicUserDetailsSerializer
+from .serializers import PublicUserBasicDetails, PublicUserDetailsSerializer, UserRolesSerializer
 from authapp.models import UserModel
 import jwt
 
@@ -102,3 +102,17 @@ class PublicAccountsViewSet(GeneralView):
     def update_user_profile(self, request):
         
         pass
+
+    @action(detail=False, methods=['GET'])
+    def get_user_roles(self, request):
+        
+        user_roles = self.get_logged_in_user(request).roles.all()  # type: ignore
+        serialized = UserRolesSerializer(
+            user_roles,
+            many=True
+        )
+        return Response({"details": serialized.data })
+
+    
+
+    

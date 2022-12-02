@@ -30,13 +30,17 @@ class PackageModel(BaseModelWithStatus):
     cover_image=models.TextField(blank=True, null=True)
     package_particulars=models.TextField(blank=True, null=True)
     requirements=models.TextField(blank=True, null=True)
+    tie_to_event=models.BooleanField(default=False)
+    expire_after_event=models.BooleanField(default=False)
 
 
 class PackageLocationModel(BaseModel):
     country=models.CharField(max_length=100, blank=True, null=True)
     county=models.CharField(max_length=100, blank=True, null=True)
     city_town=models.CharField(max_length=100, blank=True, null=True)
-    geolocation=models.JSONField(blank=True, null=True)
+    # geolocation=models.JSONField(blank=True, null=True)
+    lat = models.CharField(max_length=50, blank=True, null=True)
+    lng = models.CharField(max_length=50, blank=True, null=True)
     package=models.ForeignKey(
         PackageModel,
         on_delete=models.CASCADE,
@@ -83,6 +87,16 @@ class PackageTimelinesModel(BaseModelWithStatus):
         PackageModel,
         on_delete=models.CASCADE,
         related_name='duration'
+    )
+
+# ti a package to an event or holiday ocassion
+class PackageRelatedEvent(BaseModelWithStatus):
+    event_name=models.CharField(max_length=100, blank=False, null=False)
+    event_from=models.DateTimeField(blank=True, null=True)
+    event_to=models.DateTimeField(blank=True, null=True)
+    package=models.ManyToManyField(
+        PackageModel,
+        related_name='related_event'
     )
 
 class PackageAnalytics(BaseModel):
