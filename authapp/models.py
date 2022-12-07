@@ -93,7 +93,12 @@ class ContactsModel(models.Model):
     is_alternative_phone_number_verified=models.BooleanField(default=False)
 
 class ProfessionalAccountsModel(BaseModelWithStatus):
-    user = models.ForeignKey(UserModel, related_name="professional_accounts", on_delete=models.CASCADE)
-    account_name = models.CharField(max_length=50, null=True, blank=True)
-    # account_role = models.CharField(max_length=50, null=True, blank=True)
+    account_name = models.CharField(max_length=50, unique=True)
+    account_roles = models.ForeignKey(RolesModel, related_name='roles', on_delete=models.CASCADE)
+
+class ProfessionalUpgradesModel(BaseModelWithStatus):
+    user = models.ForeignKey(UserModel, related_name="professional_upgrade", on_delete=models.CASCADE)
+    professional_account = models.ForeignKey(ProfessionalAccountsModel, related_name='professional_accounts', on_delete=models.CASCADE)
     upgraded_by = models.CharField(max_length=50, null=True, blank=True)
+
+

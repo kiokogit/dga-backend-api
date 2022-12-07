@@ -32,6 +32,7 @@ class PackageModel(BaseModelWithStatus):
     requirements=models.TextField(blank=True, null=True)
     tie_to_event=models.BooleanField(default=False)
     expire_after_event=models.BooleanField(default=False)
+    created_by=models.UUIDField(blank=True, null=True)
 
 
 class PackageLocationModel(BaseModel):
