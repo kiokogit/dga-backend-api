@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     
-    'authapp'
+    'authapp',
+    'packages_service',
+    'usermanagement',
+    'shared_utils'
 ]
 
 MIDDLEWARE = [

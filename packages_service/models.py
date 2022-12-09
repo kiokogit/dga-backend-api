@@ -62,6 +62,7 @@ class PackageCurrencyModel(BaseModelWithStatus):
 class PackageImagesModel(BaseModelWithStatus):
     image=models.TextField(blank=True, null=True)
     uploaded_by=models.UUIDField(blank=True, null=True)
+    description=models.CharField(max_length=100, blank=True, null=True)
     package=models.ForeignKey(
         PackageModel,
         on_delete=models.CASCADE,
@@ -97,8 +98,9 @@ class PackageRelatedEvent(BaseModelWithStatus):
     event_to=models.DateTimeField(blank=True, null=True)
     package=models.ManyToManyField(
         PackageModel,
-        related_name='related_event'
+        related_name='related_events'
     )
+
 
 class PackageAnalytics(BaseModel):
     likes=models.IntegerField(default=0)

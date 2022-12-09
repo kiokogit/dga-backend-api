@@ -12,10 +12,10 @@ class PriceValidateSerializer(serializers.Serializer):
     amount=serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
 class TimelinesSerializer(serializers.Serializer):
-    package_from=serializers.DateTimeField(required=False, blank=True, null=True)
-    package_to=serializers.DateTimeField(required=False, blank=True, null=True)
-    no_of_days=serializers.IntegerField(required=False, blank=True, null=True)
-    no_of_nights=serializers.IntegerField(required=False, blank=True, null=True)
+    package_from=serializers.DateTimeField(required=False, allow_null=True)
+    package_to=serializers.DateTimeField(required=False, allow_null=True)
+    no_of_days=serializers.IntegerField(required=False, allow_null=True)
+    no_of_nights=serializers.IntegerField(required=False, allow_null=True)
 
     def validate_package_from(self, attrs):
         if attrs['package_from'] < datetime.datetime.now():
@@ -26,16 +26,16 @@ class TimelinesSerializer(serializers.Serializer):
         
 
 class LocationSerializer(serializers.Serializer):
-    country=serializers.CharField(required=False, max_length=100, blank=True, null=True)
-    county=serializers.CharField(required=False, max_length=100, blank=True, null=True)
-    city_town=serializers.CharField(required=False, max_length=100, blank=True, null=True)
-    lat = serializers.CharField(required=False, max_length=50, blank=True, null=True)
-    lng = serializers.CharField(required=False, max_length=50, blank=True, null=True)
+    country=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
+    county=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
+    city_town=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
+    lat = serializers.CharField(required=False, max_length=50, allow_blank=True, allow_null=True)
+    lng = serializers.CharField(required=False, max_length=50, allow_blank=True, allow_null=True)
 
 class TieToEventSerializer(serializers.Serializer):
-    event_name=serializers.CharField(required=False, max_length=100, blank=True, null=True)
-    event_from=serializers.DateTimeField(required=False, blank=True, null=True)
-    event_to=serializers.DateTimeField(required=False, blank=True, null=True)
+    event_name=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
+    event_from=serializers.DateTimeField(required=False, allow_null=True)
+    event_to=serializers.DateTimeField(required=False, allow_null=True)
 
 class PackageDetailsSerializer(serializers.Serializer):
     title = serializers.CharField(required=True)
@@ -51,16 +51,14 @@ class CreatePackageBaseSerializer(serializers.Serializer):
     images = serializers.ListField(
         required=False,
         child=serializers.CharField(required=True, allow_null=True, allow_blank=True),
-        allow_null=True,
-        allow_blank=True
+        allow_null=True
         )
 
     location_details = LocationSerializer()
     price = serializers.ListField(
         required=False,
         child=PriceValidateSerializer(),
-        allow_null=True,
-        allow_blank=True
+        allow_null=True
         )
 
     timelines = TimelinesSerializer()
@@ -124,3 +122,4 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
                 )
 
         return validated_data
+

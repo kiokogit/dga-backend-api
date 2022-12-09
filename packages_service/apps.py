@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class PackagesAppConfig(AppConfig):
-    name = 'packages_app'
+    name = 'packages_service'

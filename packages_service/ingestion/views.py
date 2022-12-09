@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 
-from ingestion.serializers import CreatePackageBaseSerializer, CreatePackageValidateSerializer
+from .serializers import CreatePackageBaseSerializer, CreatePackageValidateSerializer
 from .utils import BookingPermission, SMTPermission
 from shared_utils import utils
 
