@@ -1,14 +1,8 @@
 from datetime import timezone
 from django.db import models
 import uuid
+from .constants import USER_TYPES, ROLES
 # Create your models here.
-
-USER_TYPES = [
-    ('PUBLIC USER', 'PUBLIC USER'),
-    ('INTERNAL STAFF', 'INTERNAL STAFF'),
-    ('ORGANIZATION', 'ORGANIZATION')
-]
-
 
 # basic model
 class BaseModel(models.Model):
@@ -66,7 +60,7 @@ class OrganizationAccount(BaseUserModel):
 # otp model
 class OTPVerification(BaseModelWithStatus):
     user=models.ForeignKey(UserModel, related_name="otp_verification", on_delete=models.CASCADE) 
-    status=models.CharField(max_length=255, null=True, blank=True)
+    verified=models.CharField(max_length=255, null=True, blank=True)
     otp_code=models.CharField(max_length=255, null=True, blank=True)
     mode=models.CharField(max_length=255, null=True, blank=True)
     
@@ -88,7 +82,7 @@ class ResidentialAddress(BaseModelWithStatus):
 # user roles
 class RolesModel(BaseModelWithStatus):
     user=models.ForeignKey(UserModel, related_name="roles", on_delete=models.CASCADE)
-    role=models.CharField(max_length=25)
+    role=models.CharField(max_length=25, choices=ROLES, default="GENERAL STAFF")
 
 # user contacts
 class ContactsModel(models.Model):
@@ -97,3 +91,14 @@ class ContactsModel(models.Model):
     is_phone_number_verified=models.BooleanField(default=False)
     alternative_phone_number=models.CharField(max_length=50, null=True, blank=True)
     is_alternative_phone_number_verified=models.BooleanField(default=False)
+
+class ProfessionalAccountsModel(BaseModelWithStatus):
+    account_name = models.CharField(max_length=50, unique=True)
+    account_roles = models.ForeignKey(RolesModel, related_name='roles', on_delete=models.CASCADE)
+
+class ProfessionalUpgradesModel(BaseModelWithStatus):
+    user = models.ForeignKey(UserModel, related_name="professional_upgrade", on_delete=models.CASCADE)
+    professional_account = models.ForeignKey(ProfessionalAccountsModel, related_name='professional_accounts', on_delete=models.CASCADE)
+    upgraded_by = models.CharField(max_length=50, null=True, blank=True)
+
+

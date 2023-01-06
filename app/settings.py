@@ -21,6 +21,8 @@ ALLOWED_HOSTS = ['*']
 APPEND_SLASH=False
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_EXPOSE_HEADERS = ['JWTAUTH']
+CORS_ALLOW_HEADERS = ['JWTAUTH', 'Content-Type']
 
 # Application definition
 
@@ -35,7 +37,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     
-    'authapp'
+    'authapp',
+    'packages_service',
+    'usermanagement',
+    'shared_utils'
 ]
 
 MIDDLEWARE = [

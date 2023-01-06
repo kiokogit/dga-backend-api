@@ -1,14 +1,17 @@
 from rest_framework import serializers
-from .models import ContactsModel, PublicUserAccount
+
+from .utils import CreateUserRoles
+from .models import ContactsModel, PublicUserAccount, StaffUserAccount, RolesModel
 import bcrypt
 
 class CreateUserGeneralSerializer(serializers.Serializer):
     password=serializers.CharField(required=True)
-    password2=serializers.CharField(required=False)
+    password2=serializers.CharField(required=True)
     first_name=serializers.CharField(required=False)
     last_name=serializers.CharField(required=False)
     middle_name=serializers.CharField(required=False)
     email=serializers.EmailField(required=True)
+    
     
     def validate(self, data):
         # check passwords
@@ -46,22 +49,48 @@ class CreatePublicUserSerializer(CreateUserGeneralSerializer):
                 **validated_data
             )
         except Exception:
-            return
+            raise serializers.ValidationError("There was an error creating user")
         
-        # send confirmation to email/phone if entered
+        # Todo: send confirmation to email/phone if entered
         
         return validated_data
     
 class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer):
     """for general internal staff, eg director, customer care"""
+
+    def __init__(self, instance=None, data=..., **kwargs):
+        super().__init__(instance, data, **kwargs)
+        self.error_messages = []
+
     roles=serializers.ListField(
         required=True,
         child=serializers.CharField(required=True, allow_blank=False, allow_null=False)
     )
-    
-    
+
+    def validate(self, data):
+        return super().validate(data)
+
     def create(self, validated_data):
-        pass
+
+        try:
+            staff_user = StaffUserAccount.objects.create(
+                **validated_data
+            )
+
+        except Exception:
+            raise serializers.ValidationError("There was an error creating staff user")
+
+        for role in self.roles:  # type: ignore
+            created, message = CreateUserRoles (
+            user=staff_user, 
+            role=role,
+            actor=self.context["user_id"]
+            ).add_user_role()
+
+            if not created:
+                raise serializers.ValidationError(message)
+        
+        return validated_data
 
 class CreateSystemAccountsSerializer(CreateUserGeneralSerializer):
     """for system admins, superusers"""
