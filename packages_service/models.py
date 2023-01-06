@@ -12,7 +12,7 @@ PRICE_TYPES = [
 
 # basic model
 class BaseModel(models.Model):
-    id=models.UUIDField(default=uuid.uuid4(), primary_key=True, max_length=50, editable=False)
+    id=models.UUIDField(default=uuid.uuid4(), primary_key=True, max_length=50, editable=False, unique=True)
     date_created=models.DateTimeField(auto_now=True) 
     date_modified=models.DateTimeField(auto_now_add=True)
     

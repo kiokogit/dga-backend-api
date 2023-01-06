@@ -18,10 +18,10 @@ class TimelinesSerializer(serializers.Serializer):
     no_of_nights=serializers.IntegerField(required=False, allow_null=True)
 
     def validate_package_from(self, attrs):
-        if attrs['package_from'] < datetime.datetime.now():
-            raise serializers.ValidationError("Kindly choose a date or time later than now/today for start date")
-        if attrs['package_from'] >= attrs["package_to"]:
-            raise serializers.ValidationError("Please choose start date lower than the end date.")
+        # if attrs['package_from'] < datetime.datetime.now():
+        # #     raise serializers.ValidationError("Kindly choose a date or time later than now/today for start date")
+        # if attrs['package_from'] >= attrs["package_to"]:
+        #     raise serializers.ValidationError("Please choose start date lower than the end date.")
         return attrs
         
 
@@ -82,7 +82,7 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
             self.package = package_models.PackageModel.objects.create(
                 **validated_data['package'],
                 reference_number=reference_number,
-                created_by=self.context['user']
+                created_by=self.context['user_id']
             )
 
             # location
@@ -103,7 +103,7 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
             [
                 package_models.PackageImagesModel.objects.create(
                     image=i,
-                    uploaded_by=self.context['user'],
+                    uploaded_by=self.context['user_id'],
                     package=self.package
                 ) for i in validated_data['images']
             ]

@@ -13,7 +13,7 @@ from rest_framework.decorators import action
 
 
 class CreateTravelPackage(GenericViewSet):
-    permission_classes = [BookingPermission, SMTPermission ]
+    # permission_classes = [BookingPermission, SMTPermission ]
 
     @action(detail=False, methods=['POST'])
     def create_new_package(self, request):

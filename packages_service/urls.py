@@ -7,6 +7,7 @@ from rest_framework import routers
 
 router = routers.DefaultRouter(trailing_slash=False)
 
-router.register('ingestion/', CreateTravelPackage, basename='ingestion_create')
+router.register('ingestion', CreateTravelPackage, basename='ingestion_create')
+router.register('views', PackagesView, basename='packs')
 
 urlpatterns=router.urls

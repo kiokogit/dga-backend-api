@@ -24,7 +24,7 @@ class PackagePublicViewSerializer(serializers.ModelSerializer):
         fields=[
             'title',
             'cover_image',
-            'parkage_particulars',
+            'package_particulars',
             'description',
             'id',
             'requirements',
@@ -76,7 +76,7 @@ class PublicDetailViewSerializer(serializers.ModelSerializer):
         fields=[
             'title',
             'cover_image',
-            'parkage_particulars',
+            'package_particulars',
             'description',
             'id',
             'requirements',
@@ -135,4 +135,3 @@ class PublicDetailViewSerializer(serializers.ModelSerializer):
     def get_reviews(self, obj):
 
         return {}
-
