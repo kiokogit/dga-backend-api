@@ -10,32 +10,7 @@ class PriceValidateSerializer(serializers.Serializer):
     type=serializers.CharField(required=False, allow_blank=True, allow_null=True)
     currency=serializers.CharField(required=False, allow_blank=True, allow_null=True)
     amount=serializers.CharField(required=False, allow_blank=True, allow_null=True)
-
-class TimelinesSerializer(serializers.Serializer):
-    package_from=serializers.DateTimeField(required=False, allow_null=True)
-    package_to=serializers.DateTimeField(required=False, allow_null=True)
-    no_of_days=serializers.IntegerField(required=False, allow_null=True)
-    no_of_nights=serializers.IntegerField(required=False, allow_null=True)
-
-    def validate_package_from(self, attrs):
-        # if attrs['package_from'] < datetime.datetime.now():
-        # #     raise serializers.ValidationError("Kindly choose a date or time later than now/today for start date")
-        # if attrs['package_from'] >= attrs["package_to"]:
-        #     raise serializers.ValidationError("Please choose start date lower than the end date.")
-        return attrs
-        
-
-class LocationSerializer(serializers.Serializer):
-    country=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
-    county=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
-    city_town=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
-    lat = serializers.CharField(required=False, max_length=50, allow_blank=True, allow_null=True)
-    lng = serializers.CharField(required=False, max_length=50, allow_blank=True, allow_null=True)
-
-class TieToEventSerializer(serializers.Serializer):
-    event_name=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
-    event_from=serializers.DateTimeField(required=False, allow_null=True)
-    event_to=serializers.DateTimeField(required=False, allow_null=True)
+ 
 
 class PackageDetailsSerializer(serializers.Serializer):
     title = serializers.CharField(required=True)
@@ -45,24 +20,32 @@ class PackageDetailsSerializer(serializers.Serializer):
     cover_image = serializers.CharField(required=True, allow_null=True, allow_blank=True)
     tie_to_event = serializers.BooleanField(allow_null=True)
     expire_after_event = serializers.BooleanField(allow_null=True)
+    event_name=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
+    event_from=serializers.DateTimeField(required=False, allow_null=True)
+    event_to=serializers.DateTimeField(required=False, allow_null=True)
+    country=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
+    county=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
+    city_town=serializers.CharField(required=False, max_length=100, allow_blank=True, allow_null=True)
+    lat = serializers.CharField(required=False, max_length=50, allow_blank=True, allow_null=True)
+    lng = serializers.CharField(required=False, max_length=50, allow_blank=True, allow_null=True)
+    package_from=serializers.DateTimeField(required=False, allow_null=True)
+    package_to=serializers.DateTimeField(required=False, allow_null=True)
+    no_of_days=serializers.IntegerField(required=False, allow_null=True)
+    no_of_nights=serializers.IntegerField(required=False, allow_null=True)
 
 class CreatePackageBaseSerializer(serializers.Serializer):
     package = PackageDetailsSerializer()
     images = serializers.ListField(
         required=False,
-        child=serializers.CharField(required=True, allow_null=True, allow_blank=True),
+        child=serializers.DictField(required=True),
         allow_null=True
         )
 
-    location_details = LocationSerializer()
     price = serializers.ListField(
         required=False,
         child=PriceValidateSerializer(),
         allow_null=True
         )
-
-    timelines = TimelinesSerializer()
-    event = TieToEventSerializer()
 
 class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
 
@@ -71,7 +54,9 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
         self.package = None
 
     def validate(self, attrs):
-        # 
+        # if not staff
+        # if self.context['user_type'] != "STAFF":
+        #     raise serializers.ValidationError("You do not have permission to perform this action.")
         return attrs
 
     def create(self, validated_data):
@@ -85,41 +70,22 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
                 created_by=self.context['user_id']
             )
 
-            # location
-            package_models.PackageLocationModel.objects.create(
-                **validated_data['location_details'],
-                package=self.package
-            )
+            # images
+            [
+                package_models.PackageImagesModel.objects.create(
+                    image=i['image'],
+                    description=i['name'],
+                    package_id=self.package.package_id
+                ) for i in validated_data['images']
+            ]
 
             # prices
             [
                 package_models.PackageCurrencyModel.objects.create(
                     **i,
-                    package=self.package
+                    package_id=self.package.package_id
                 ) for i in validated_data['price']
             ]
-
-            # images
-            [
-                package_models.PackageImagesModel.objects.create(
-                    image=i,
-                    uploaded_by=self.context['user_id'],
-                    package=self.package
-                ) for i in validated_data['images']
-            ]
-
-            # timelines
-            package_models.PackageTimelinesModel.objects.create(
-                **validated_data['timelines'],
-                package=self.package
-            )
-
-            # tie to event
-            if validated_data['tie_to_event']:
-                package_models.PackageRelatedEvent.objects.create(
-                    **validated_data['event'],
-                    package=self.package
-                )
 
         return validated_data
 

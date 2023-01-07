@@ -75,9 +75,15 @@ class GetUsersList:
         else:
             return True
 
-
 def generate_package_ref():
-    return "PCK/"+ str(datetime.datetime.year) + "/" + str(random.randint(0, 2000))
+    characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    
+    result = 'PCKG23/'
+    charactersLength = len(characters)
+    for i in range(0, 10):
+        result += characters[round(random.random()*charactersLength)]
+
+    return result
 
 def generate_process_ref(process_code:str):
-    return process_code + str(datetime.datetime.year) + "/" + str(random.randint(0, 2000))
+    return process_code + "23"+ "/" + str(random.randint(0, 2000))
