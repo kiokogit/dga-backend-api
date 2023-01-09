@@ -81,7 +81,7 @@ def generate_package_ref():
     result = 'PCKG23/'
     charactersLength = len(characters)
     for i in range(0, 10):
-        result += characters[round(random.random()*charactersLength)]
+        result += characters[round(random.random()*(charactersLength-1))]
 
     return result
 
