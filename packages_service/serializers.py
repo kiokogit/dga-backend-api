@@ -33,12 +33,12 @@ class PackagePublicViewSerializer(serializers.ModelSerializer):
         fields=[
             'title',
             'cover_image',
-            'package_particulars',
             'description',
             'package_id',
-            'requirements',
             'cost',
-            'reference_number'
+            'reference_number',
+            'no_of_days',
+            'no_of_nights'
         ]
     
     def get_cost(self, obj):
