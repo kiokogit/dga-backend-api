@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.views.generic import ListView
+from django.core.paginator import Paginator
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -13,9 +15,11 @@ from rest_framework.decorators import action
 
 # Create your views here.
 
-class PackagesView(GenericViewSet):
+class PackagesView(GenericViewSet, ListView):
     # permission_classes = [BookingPermission, SMTPermission ]
     serializer_class = PackagePublicViewSerializer
+    paginate_by = 6
+    model = PackageModel
 
     def get_queryset(self):
         return super().get_queryset()
@@ -23,13 +27,16 @@ class PackagesView(GenericViewSet):
     @action(detail=False, methods=['GET'])
     def packages_list(self, request):
        
-       all_packs = PackageModel.objects.all()
+       all_packs = PackageModel.objects.all().order_by("-date_created")
+       paged = Paginator(all_packs, 6)
+       
+       pageered = paged.page(request.query_params.get('page'))
 
        serializer = PackagePublicViewSerializer(
-        all_packs,
+        pageered,
         many=True
        )
-       return Response(serializer.data)
+       return Response({"data":serializer.data, "count":all_packs.count()})
 
     @action(detail=False, methods=['GET'])
     def package_detail_view(self, request):
