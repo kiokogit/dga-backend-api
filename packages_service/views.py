@@ -53,3 +53,20 @@ class PackagesView(GenericViewSet, ListView):
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['GET'])
+    def package_by_tags(self, request):
+
+        result = []
+        filters = request.query_params.get("filter").split(',')
+        for t in filters:
+            count = PackageModel.objects.filter(
+                tags__tag__startswith=t
+            ).count()
+        
+            query_set = {
+                "tag":t,
+                "count":count
+            }
+            result.append(query_set)
+
+        return Response(result)

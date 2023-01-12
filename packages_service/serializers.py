@@ -50,10 +50,17 @@ class PackagePublicViewSerializer(serializers.ModelSerializer):
             many=False
         ).data
 
+class TagsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=package_models.TagsModel
+        fields=['tag']
+
 class PublicDetailViewSerializer(serializers.ModelSerializer):
     reviews=serializers.SerializerMethodField(read_only=True)
     images=serializers.SerializerMethodField(read_only=True)
     cost=serializers.SerializerMethodField(read_only=True)
+    categories=serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model=package_models.PackageModel
@@ -81,7 +88,8 @@ class PublicDetailViewSerializer(serializers.ModelSerializer):
             'lat',
             'lng',
             'likes',
-            'dislikes'
+            'dislikes', 
+            'categories'
         ]
 
     def get_images(self, obj):
@@ -104,5 +112,11 @@ class PublicDetailViewSerializer(serializers.ModelSerializer):
             package_models.PackageCurrencyModel.objects.filter(
                 package_id=obj.package_id
             ).all(),
+            many=True
+        ).data
+
+    def get_categories(self, obj):
+        return TagsSerializer(
+            obj.tags.all().values('tag'),
             many=True
         ).data
