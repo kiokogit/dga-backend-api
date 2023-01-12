@@ -22,6 +22,10 @@ class BaseModelWithStatus(BaseModel):
     date_deleted=models.DateTimeField(blank=True, null=True)
 
 
+class TagsModel(BaseModel):
+    tag=models.CharField(max_length=100, blank=True, null=True)
+
+
 class PackageModel(BaseModelWithStatus):
     package_id=models.UUIDField(default=uuid.uuid4(), primary_key=True, max_length=50, editable=False)
     title=models.CharField(max_length=100)
@@ -52,6 +56,8 @@ class PackageModel(BaseModelWithStatus):
 
     likes=models.IntegerField(default=0)
     dislikes=models.IntegerField(default=0)
+
+    tags=models.ManyToManyField(TagsModel)
 
     class Meta:
         unique_together = ['reference_number', 'package_id']

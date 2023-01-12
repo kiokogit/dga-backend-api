@@ -46,6 +46,11 @@ class CreatePackageBaseSerializer(serializers.Serializer):
         child=PriceValidateSerializer(),
         allow_null=True
         )
+    tags = serializers.ListField(
+        required=False,
+        child=serializers.CharField(required=True, max_length=50),
+        allow_null=True
+        )
 
 class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
 
@@ -69,6 +74,20 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
                 reference_number=reference_number,
                 created_by=self.context['user_id']
             )
+
+            new_tags = []
+            for t in validated_data['tags']:
+                tag_exists = package_models.TagsModel.objects.all().filter(tag=t)
+                if not tag_exists.exists():
+                    tag = package_models.TagsModel.objects.create(
+                    tag=t
+                        )
+                    new_tags.append(tag)
+                else:
+                    new_tags.append(tag_exists.first())
+        
+            self.package.tags.set(new_tags)
+            self.package.save()
 
             # images
             [
