@@ -3,6 +3,7 @@ from django.views.generic import ListView
 from django.core.paginator import Paginator
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 
 from packages_service.models import PackageModel
 
@@ -56,17 +57,54 @@ class PackagesView(GenericViewSet, ListView):
     @action(detail=False, methods=['GET'])
     def package_by_tags(self, request):
 
-        result = []
         filters = request.query_params.get("filter").split(',')
-        for t in filters:
-            count = PackageModel.objects.filter(
-                tags__tag__startswith=t
-            ).count()
-        
-            query_set = {
-                "tag":t,
-                "count":count
-            }
-            result.append(query_set)
+        if filters[0]!="":
+            all_packs = PackageModel.objects.filter(
+                tags__tag__in=filters
+            ).all().order_by("-date_created")
+        else:
+            all_packs = PackageModel.objects.all().order_by("-date_created")
+    
+        paged = Paginator(all_packs, 6)
+       
+        pageered = paged.page(request.query_params.get('page'))
 
-        return Response(result)
+        serializer = PackagePublicViewSerializer(
+            pageered,
+            many=True
+        )
+
+        query_set = {
+            "data":serializer.data, 
+            "count":all_packs.count(),
+            "tags":filters
+            }
+        return Response(query_set, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['GET'])
+    def packages_search(self, request):
+        search_value = request.query_params.get('SEARCH')
+        all_packs = PackageModel.objects.filter(
+            Q(title__contains=search_value) | 
+            Q(tags__tag__in=search_value) |
+            Q(description__contains=search_value) |
+            Q(country__contains=search_value) |
+            Q(county__contains=search_value) |
+            Q(city_town__contains=search_value)
+        ).all().order_by('-date_created').distinct()
+
+        paged = Paginator(all_packs, 6)
+       
+        pageered = paged.page(request.query_params.get('page'))
+
+        serializer = PackagePublicViewSerializer(
+            pageered,
+            many=True
+        )
+
+        query_set = {
+            "data":serializer.data, 
+            "count":all_packs.count(),
+            "tags":[search_value]
+            }
+        return Response(query_set, status=status.HTTP_200_OK)
