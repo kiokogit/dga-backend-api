@@ -77,10 +77,10 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
 
             new_tags = []
             for t in validated_data['tags']:
-                tag_exists = package_models.TagsModel.objects.all().filter(tag=t)
+                tag_exists = package_models.TagsModel.objects.all().filter(tag=t.lower())
                 if not tag_exists.exists():
                     tag = package_models.TagsModel.objects.create(
-                    tag=t
+                    tag=t.lower()
                         )
                     new_tags.append(tag)
                 else:
@@ -101,7 +101,9 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
             # prices
             [
                 package_models.PackageCurrencyModel.objects.create(
-                    **i,
+                    type=i['type'],
+                    amount=i['amount'],
+                    currency=i['currency'],
                     package_id=self.package.package_id
                 ) for i in validated_data['price']
             ]
