@@ -38,7 +38,7 @@ class PackagePublicViewSerializer(serializers.ModelSerializer):
             'cost',
             'reference_number',
             'no_of_days',
-            'no_of_nights'
+            'no_of_nights',
         ]
     
     def get_cost(self, obj):
@@ -120,3 +120,18 @@ class PublicDetailViewSerializer(serializers.ModelSerializer):
             obj.tags.all().values('tag'),
             many=True
         ).data
+
+
+
+class PackagesListStaffSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=package_models.PackageModel
+        fields=[
+            'title',
+            'cover_image',
+            'description',
+            'package_id',
+            'reference_number',
+            "is_active",
+            "is_deleted"
+        ]
