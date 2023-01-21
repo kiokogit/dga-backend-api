@@ -89,7 +89,9 @@ class PublicDetailViewSerializer(serializers.ModelSerializer):
             'lng',
             'likes',
             'dislikes', 
-            'categories'
+            'categories',
+            'package_id',
+            "is_active",
         ]
 
     def get_images(self, obj):
@@ -133,5 +135,6 @@ class PackagesListStaffSerializer(serializers.ModelSerializer):
             'package_id',
             'reference_number',
             "is_active",
-            "is_deleted"
+            'city_town',
+            'country'
         ]
