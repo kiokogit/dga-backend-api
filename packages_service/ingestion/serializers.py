@@ -109,4 +109,3 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
             ]
 
         return validated_data
-

@@ -7,7 +7,7 @@ from django.db.models import Q
 
 from packages_service.models import PackageModel
 
-from .serializers import PackagePublicViewSerializer, PublicDetailViewSerializer
+from .serializers import PackagePublicViewSerializer, PackagesListStaffSerializer, PublicDetailViewSerializer
 from .ingestion.utils import BookingPermission, SMTPermission
 from shared_utils import utils
 
@@ -28,12 +28,28 @@ class PackagesView(GenericViewSet, ListView):
     @action(detail=False, methods=['GET'])
     def packages_list(self, request):
        
-       all_packs = PackageModel.objects.all().order_by("-date_created")
+       all_packs = PackageModel.objects.filter(
+        is_active=True
+       ).order_by("-date_created")
        paged = Paginator(all_packs, 6)
        
        pageered = paged.page(request.query_params.get('page'))
 
        serializer = PackagePublicViewSerializer(
+        pageered,
+        many=True
+       )
+       return Response({"data":serializer.data, "count":all_packs.count()})
+
+    @action(detail=False, methods=['GET'])
+    def packages_list_staff(self, request):
+       
+       all_packs = PackageModel.objects.all().order_by("-date_created")
+       paged = Paginator(all_packs, 6)
+       
+       pageered = paged.page(request.query_params.get('page'))
+
+       serializer = PackagesListStaffSerializer(
         pageered,
         many=True
        )
@@ -60,10 +76,13 @@ class PackagesView(GenericViewSet, ListView):
         filters = request.query_params.get("filter").split(',')
         if filters[0]!="":
             all_packs = PackageModel.objects.filter(
-                tags__tag__in=filters
-            ).all().order_by("-date_created")
+                tags__tag__in=filters,
+                is_active=True
+            ).order_by("-date_created")
         else:
-            all_packs = PackageModel.objects.all().order_by("-date_created")
+            all_packs = PackageModel.objects.filter(
+                is_active=True
+                ).order_by("-date_created")
     
         paged = Paginator(all_packs, 6)
        
@@ -91,7 +110,9 @@ class PackagesView(GenericViewSet, ListView):
             Q(country__contains=search_value) |
             Q(county__contains=search_value) |
             Q(city_town__contains=search_value)
-        ).all().order_by('-date_created').distinct()
+        ).filter(
+            is_active=True
+        ).order_by('-date_created').distinct()
 
         paged = Paginator(all_packs, 6)
        

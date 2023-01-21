@@ -12,12 +12,12 @@ PRICE_TYPES = [
 
 # basic model
 class BaseModel(models.Model):
-    date_created=models.DateTimeField(auto_now=True) 
-    date_modified=models.DateTimeField(auto_now_add=True)
+    date_created=models.DateTimeField(auto_now_add=True) 
+    date_modified=models.DateTimeField(auto_now=True)
     
     
 class BaseModelWithStatus(BaseModel):
-    is_active=models.BooleanField(default=False)
+    is_active=models.BooleanField(default=True)
     is_deleted=models.BooleanField(default=False)
     date_deleted=models.DateTimeField(blank=True, null=True)
 
@@ -81,3 +81,10 @@ class PackageReviewsModel(BaseModel):
     review_text=models.TextField(blank=True, null=True)
     reviewed_by=models.CharField(max_length=100, default='Anonymous')
     package_id=models.UUIDField(blank=True, null=True)
+
+class PackageRemarks(BaseModel):
+    status = models.CharField(max_length=100, null=True, blank=True)
+    package_id=models.UUIDField(blank=True, null=True)
+    remark = models.TextField(blank=True, null=True)
+    actor_role = models.CharField(max_length=100, null=True, blank=True)
+    actor_id = models.UUIDField(blank=True, null=True)
