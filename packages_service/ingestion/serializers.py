@@ -98,7 +98,7 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
                 ) for i in validated_data['images']
             ]
 
-            # prices
+            # prices/costs list
             [
                 package_models.PackageCurrencyModel.objects.create(
                     type=i['type'],
@@ -115,4 +115,33 @@ class DeleteArchiveRestorePackageSerializer(serializers.Serializer):
     request_id = serializers.CharField(required=True)
     delete_archive_restore = serializers.CharField(required=True)
     
+
+
+class EditPackageSerializer(serializers.Serializer):
+
+    def __init__(self, instance=None, data=..., **kwargs):
+        super().__init__(instance, data, **kwargs)
+        self.package_instance = None
+
+
+    def validate(self, attrs):
+        try:
+            self.package_instance = package_models.PackageModel.objects.filter(package_id=attrs['package']['package_id'])
+
+        except package_models.PackageModel.DoesNotExist or TypeError:
+            raise serializers.ValidationError("Package does not exist. Wrong ID passed")
+
+        return attrs
+
+    def create(self, validated_data):
+
+        # save package data
+        package_instance = package_models.PackageModel.objects.filter(package_id=validated_data['package']['package_id'])
+        try:
+            package_instance.update(**validated_data['package'])
+        
+        except Exception as e:
+            print(e)
+
+        return validated_data
 
