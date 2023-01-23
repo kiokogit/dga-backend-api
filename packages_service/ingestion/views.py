@@ -27,6 +27,7 @@ class CreateTravelPackage(GenericViewSet):
             context=utils.get_serializer_context(request)
         )
         if not serializer.is_valid():
+            print(serializer.errors)
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer.save()
