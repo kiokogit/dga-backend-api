@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import CreatePackageBaseSerializer, CreatePackageValidateSerializer
+from .serializers import CreatePackageBaseSerializer, CreatePackageValidateSerializer, EditPackageSerializer
 from .utils import BookingPermission, SMTPermission
 from shared_utils import utils
 
@@ -68,4 +68,23 @@ class CreateTravelPackage(GenericViewSet):
 
         return Response({"details":"Package successfully Updated"}, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['POST'])
+    def edit_package_details(self, request):
+        package_data = request.data.get('package')
+        
+        # save package data
+        package_instance = package_models.PackageModel.objects.filter(package_id=package_data['package_id']).first()
+        if package_instance is not None:
+            package_instance.title = package_data['title']
+            package_instance.cover_image = package_data['cover_image']
+            package_instance.description = package_data['description']
+            package_instance.country = package_data['country']
+            package_instance.city_town = package_data['city_town']
+            package_instance.package_from = package_data['package_from']
+            package_instance.package_to = package_data['package_to']
+        
+            package_instance.save()
+            return Response({"details":"Data updated successfully"}, status=status.HTTP_200_OK)
+
+        return Response({"details":"details not updated."}, status=status.HTTP_400_BAD_REQUEST)
 
