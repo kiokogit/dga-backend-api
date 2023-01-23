@@ -109,3 +109,10 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
             ]
 
         return validated_data
+
+
+class DeleteArchiveRestorePackageSerializer(serializers.Serializer):
+    request_id = serializers.CharField(required=True)
+    delete_archive_restore = serializers.CharField(required=True)
+    
+

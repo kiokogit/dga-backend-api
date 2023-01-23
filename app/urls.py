@@ -20,5 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('authapp.urls')),
     path('user/', include('usermanagement.urls')),
-    path('packages/', include('packages_service.urls'))
+    path('packages/', include('packages_service.urls')),
+    path('utils/', include('shared_utils.urls'))
 ]
