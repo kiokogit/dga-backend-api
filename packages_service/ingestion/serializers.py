@@ -98,7 +98,7 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
                 ) for i in validated_data['images']
             ]
 
-            # prices
+            # prices/costs list
             [
                 package_models.PackageCurrencyModel.objects.create(
                     type=i['type'],
