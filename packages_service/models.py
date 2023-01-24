@@ -17,7 +17,7 @@ class BaseModel(models.Model):
     
     
 class BaseModelWithStatus(BaseModel):
-    is_active=models.BooleanField(default=True)
+    is_active=models.BooleanField(default=False)
     is_deleted=models.BooleanField(default=False)
     date_deleted=models.DateTimeField(blank=True, null=True)
 
