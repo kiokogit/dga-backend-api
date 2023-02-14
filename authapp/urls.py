@@ -5,6 +5,11 @@ from rest_framework import routers
 
 router = routers.DefaultRouter(trailing_slash=False)
 
-router.register('account', UsersAccountsManagerViewSet, basename='accounts')
+router.register('user', SignUpUser, basename='accounts')
+router.register('', LoginUser, basename='login_user')
+
+# urlpatterns = [
+#     path(" ", LoginUser.as_view())
+# ]
 
 urlpatterns=router.urls

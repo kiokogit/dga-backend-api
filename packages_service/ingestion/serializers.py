@@ -119,14 +119,10 @@ class DeleteArchiveRestorePackageSerializer(serializers.Serializer):
 
 class EditPackageSerializer(serializers.Serializer):
 
-    def __init__(self, instance=None, data=..., **kwargs):
-        super().__init__(instance, data, **kwargs)
-        self.package_instance = None
-
 
     def validate(self, attrs):
         try:
-            self.package_instance = package_models.PackageModel.objects.filter(package_id=attrs['package']['package_id'])
+            package_instance = package_models.PackageModel.objects.filter(package_id=attrs['package']['package_id'])
 
         except package_models.PackageModel.DoesNotExist or TypeError:
             raise serializers.ValidationError("Package does not exist. Wrong ID passed")
@@ -134,14 +130,33 @@ class EditPackageSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
+        print(validated_data)
+        try:
+            package_instance = package_models.PackageModel.objects.filter(package_id=validated_data['package']['package_id'])
+
+        except package_models.PackageModel.DoesNotExist or TypeError:
+            raise serializers.ValidationError("Package does not exist. Wrong ID passed")
 
         # save package data
-        package_instance = package_models.PackageModel.objects.filter(package_id=validated_data['package']['package_id'])
         try:
-            package_instance.update(**validated_data['package'])
-        
+            package_instance.update(**validated_data['package']) # type:ignore
         except Exception as e:
             print(e)
+        images = validated_data['images']
+        current_images = package_models.PackageImagesModel.objects.filter(
+            package_id=package_instance.first().package_id  # type:ignore
+        ).all()
+        for i in current_images:
+            if i not in images:
+                i.is_active=False
+                i.save()
+        for i in images:
+            if i not in current_images:
+                package_models.PackageImagesModel.objects.create(
+                    package_id=package_instance.first().package_id  # type:ignore
+                    **i
+                )
+            
 
         return validated_data
 

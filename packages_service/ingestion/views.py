@@ -12,6 +12,8 @@ from rest_framework.decorators import action
 
 from .. import models as package_models
 
+import re
+
 
 # Create your views here.
 
@@ -70,21 +72,35 @@ class CreateTravelPackage(GenericViewSet):
 
     @action(detail=False, methods=['POST'])
     def edit_package_details(self, request):
-        package_data = request.data.get('package')
-        
+        validated_data = request.data
+
+    # save package data
+        try:
+            package_instance = package_models.PackageModel.objects.filter(package_id=validated_data['package']['package_id'])
+
+        except package_models.PackageModel.DoesNotExist or TypeError:
+            return ("Package does not exist. Wrong ID passed")
+
         # save package data
-        package_instance = package_models.PackageModel.objects.filter(package_id=package_data['package_id']).first()
-        if package_instance is not None:
-            package_instance.title = package_data['title']
-            package_instance.cover_image = package_data['cover_image']
-            package_instance.description = package_data['description']
-            package_instance.country = package_data['country']
-            package_instance.city_town = package_data['city_town']
-            package_instance.package_from = package_data['package_from']
-            package_instance.package_to = package_data['package_to']
-        
-            package_instance.save()
-            return Response({"details":"Data updated successfully"}, status=status.HTTP_200_OK)
+        try:
+            package_instance.update(**validated_data['package']) # type:ignore
+        except Exception as e:
+            print(e)
+        images = validated_data['images']
+        current_images = package_models.PackageImagesModel.objects.filter(
+            package_id=package_instance.first().package_id  # type:ignore
+        ).all()
+        for i in current_images:
+            if i not in images:
+                i.is_active=False
+                i.save()
+        for i in images:
+            if i not in current_images:
+                package_models.PackageImagesModel.objects.create(
+                    package_id=package_instance.first().package_id  # type:ignore
+                    **i
+                )
+            
 
         return Response({"details":"details not updated."}, status=status.HTTP_400_BAD_REQUEST)
 

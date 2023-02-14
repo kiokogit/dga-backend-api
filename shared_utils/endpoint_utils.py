@@ -22,3 +22,15 @@ class GetCountriesData(GenericViewSet):
         data = json.loads(requests.get(url, headers=headers).content.decode('utf-8')) # Here you have the data that you need
         return Response(data, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['GET'])
+    def get_cities_towns(self, request):
+
+        url = f"https://api.countrystatecity.in/v1/countries/{request.query_params.get('code')}/cities"
+
+        headers = {
+        'X-CSCAPI-KEY': 'WE5ub1lWbTV5ZTRaVU54QlJIb2V3TXBkNFRxUWNlQW1XU3p5MXNoTA=='
+        }
+
+        response = json.loads(requests.request("GET", url, headers=headers).content.decode('utf-8'))
+
+        return Response(response, status=status.HTTP_200_OK)

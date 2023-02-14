@@ -18,7 +18,7 @@ class GeneralView(GenericViewSet):
     def return_headers(self, request):
         headers = {
             "JWTAUTH":request.headers['JWTAUTH'].split(' ')[1],
-            # "Authorization":request.headers["Authorization"].split(' ')[1]
+            "Authorization":request.headers["Authorization"].split(' ')[1]
         }
         return headers
     
@@ -41,7 +41,7 @@ class GeneralView(GenericViewSet):
     
     def get_user_by_id(self, id):
         try:
-            user = UserModel.objects.get(id=id)
+            user = UserModel.objects.get(user_id=id)
         except UserModel.DoesNotExist:
             return None
         return user
@@ -111,7 +111,8 @@ class PublicAccountsViewSet(GeneralView):
             user_roles,
             many=True
         )
-        return Response({"details": serialized.data })
+        print(serialized.data)
+        return Response(serialized.data)
 
     
 

@@ -4,7 +4,7 @@ from authapp import models
 
 class PublicUserBasicDetails(serializers.ModelSerializer):
     class Meta:
-        model=models.PublicUserAccount
+        model=models.UserModel
         fields=[
                 "first_name",
                 "email",
@@ -18,7 +18,7 @@ class PublicUserDetailsSerializer(PublicUserBasicDetails):
     
     class Meta(PublicUserBasicDetails.Meta):
         fields= PublicUserBasicDetails.Meta.fields + [
-            "id",
+            "user_id",
             "user_type",
             "date_created",
             "is_active",
@@ -47,9 +47,10 @@ class PublicUserDetailsSerializer(PublicUserBasicDetails):
         else:
             return "No Entry"
 
-class UserRolesSerializer(serializers.Serializer):
+class UserRolesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.RolesModel
         fields=[
-            "role"
+            "role",
+            "is_active"
         ]
