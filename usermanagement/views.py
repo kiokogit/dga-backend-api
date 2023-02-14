@@ -111,7 +111,6 @@ class PublicAccountsViewSet(GeneralView):
             user_roles,
             many=True
         )
-        print(serialized.data)
         return Response(serialized.data)
 
     

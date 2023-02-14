@@ -13,6 +13,7 @@ from shared_utils import utils
 
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 # Create your views here.
 
@@ -21,6 +22,7 @@ class PackagesView(GenericViewSet, ListView):
     serializer_class = PackagePublicViewSerializer
     paginate_by = 6
     model = PackageModel
+    permission_classes=(AllowAny,)
 
     def get_queryset(self):
         return super().get_queryset()
