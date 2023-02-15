@@ -31,13 +31,13 @@ class CreateUserRoles:
             else:
                 return True
 
-        elif self.role in ["FINANCE OFFICER", "BOOKING MANAGER", "BOOKING OFFICER", "ICT OFFICER"]:
-            if "GENERAL MANAGER" not in get_user_roles(self.actor_id):
+        elif self.role in ["FINANCE OFFICER", "BOOKING MANAGER", "BOOKING OFFICER", "ICT OFFICER", "TOUR GUIDE", "DATA CLERK"]:
+            if "DIRECTOR" not in get_user_roles(self.actor_id):
                 return False
             else:
                  return True
 
-        elif self.role in ["CUSTOMER CARE", "GENERAL STAFF"]:
+        elif self.role in ["CUSTOMER CARE", "GENERAL STAFF", "DATA CLERK"]:
             if "ICT OFFICER" not in get_user_roles(self.actor_id):
                 return False
             else:
