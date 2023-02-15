@@ -11,18 +11,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g$1n#9%#q1(_a_!m_#e&j=js)zf-=e5a8m+(fa#l=z*9ro*-s4'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
 APPEND_SLASH=False
+ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_EXPOSE_HEADERS = ['JWTAUTH']
-CORS_ALLOW_HEADERS = ['JWTAUTH', 'Content-Type']
+CORS_EXPOSE_HEADERS = ['JWTAUTH', 'Authorization']
+CORS_ALLOW_HEADERS = ['JWTAUTH', 'Content-Type', 'Authorization']
 
 # Application definition
 
@@ -36,6 +30,8 @@ INSTALLED_APPS = [
     
     'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
+    'django_filters',
     
     'authapp',
     'packages_service',
@@ -76,15 +72,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'authapp.authentication.BearerAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter'
+    ]
 }
 
 
@@ -143,3 +145,19 @@ SERVICE_URLS={
 
 runserver.default_port = SERVICE_URLS['ACL_SERVICE']       # <-- Your port
 runserver.default_addr = '127.0.0.1'   # <-- Your address
+
+
+LOGGING = {
+    'version':1,
+    'disable_existing_loggers':False,
+    "handlers":{
+        'file':{
+            'class': 'logging.FileHandler',
+            'filename': 'general.log'
+        }
+    }
+}
+
+
+AUTH_USER_MODEL = 'authapp.UserModel'
+

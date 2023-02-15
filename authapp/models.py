@@ -1,61 +1,75 @@
-from datetime import timezone
+from datetime import datetime, timezone
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser
 import uuid
 from .constants import USER_TYPES, ROLES
 # Create your models here.
 
 # basic model
 class BaseModel(models.Model):
-    id=models.UUIDField(default=uuid.uuid4(), primary_key=True, max_length=50, editable=False)
     date_created=models.DateTimeField(auto_now=True) 
     date_modified=models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        abstract = True
     
     
 class BaseModelWithStatus(BaseModel):
-    is_active=models.BooleanField(default=False)
+    is_active=models.BooleanField(default=True)
     is_deleted=models.BooleanField(default=False)
     date_deleted=models.DateTimeField(blank=True, null=True)
 
+    class Meta:
+        abstract = True
+
 
 # basic user model
-class BaseUserModel(BaseModelWithStatus):
+class BaseUserModel(BaseModelWithStatus, AbstractBaseUser):
     is_email_verified=models.BooleanField(default=False)
     is_sms_verified=models.BooleanField(default=False)
     email=models.EmailField(max_length=255, unique=True)
     password=models.CharField(max_length=255)
+
+    class Meta:
+        abstract = True
     
 
 # basic user
 class UserModel(BaseUserModel):
+    user_id=models.UUIDField(default=uuid.uuid4(), max_length=50, editable=False)
     first_name=models.CharField(max_length=50, null=True, blank=True)
     middle_name=models.CharField(max_length=50, null=True, blank=True)
     last_name=models.CharField(max_length=50, null=True, blank=True)
     user_type=models.CharField(max_length=25, default="PUBLIC USER", choices=USER_TYPES)
+
+    REQUIRED_FIELDS = [
+        'password',
+        'user_type'
+    ]
+
+    USERNAME_FIELD = 'email'
+
     
     
 # public user
-class PublicUserAccount(UserModel):
-    
-    def __str__(self) -> str:
-        return self.email   
-    
+class PublicUserAccount(models.Model):
+    user=models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='public_account')
+
 
 # staff user
-class StaffUserAccount(UserModel):
+class StaffUserAccount(models.Model):
+    user=models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='staff_account')
     is_admin=models.BooleanField(default=False)
     is_superuser=models.BooleanField(default=False)
     is_general_staff=models.BooleanField(default=False)
 
-    def __str__(self) -> str:
-        return self.email
     
 # Organization account
-class OrganizationAccount(BaseUserModel):
+class OrganizationAccount(models.Model):
+    user=models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='organization_account')
     name=models.CharField(max_length=255)
     industry=models.CharField(max_length=255)
 
-    def __str__(self) -> str:
-        return self.email + ' ' + self.name
 
 # otp model
 class OTPVerification(BaseModelWithStatus):
@@ -67,7 +81,7 @@ class OTPVerification(BaseModelWithStatus):
     
 # residential address for public
 class ResidentialAddress(BaseModelWithStatus):
-    user=models.ForeignKey(PublicUserAccount, related_name='user_location', on_delete=models.CASCADE) 
+    user=models.ForeignKey(UserModel, related_name='user_location', on_delete=models.CASCADE) 
     country=models.CharField(max_length=50, null=True, blank=True)
     state=models.CharField(max_length=50, null=True, blank=True)
     county=models.CharField(max_length=50, null=True, blank=True)

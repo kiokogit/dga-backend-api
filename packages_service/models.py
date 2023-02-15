@@ -12,14 +12,20 @@ PRICE_TYPES = [
 
 # basic model
 class BaseModel(models.Model):
-    date_created=models.DateTimeField(auto_now_add=True) 
-    date_modified=models.DateTimeField(auto_now=True)
+    date_created=models.DateTimeField(auto_now_add=True, null=True, blank=True) 
+    date_modified=models.DateTimeField(auto_now=True, null=True, blank=True)
+
+    class Meta:
+        abstract=True
     
     
 class BaseModelWithStatus(BaseModel):
     is_active=models.BooleanField(default=False)
     is_deleted=models.BooleanField(default=False)
     date_deleted=models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        abstract=True
 
 
 class TagsModel(BaseModel):
@@ -27,7 +33,7 @@ class TagsModel(BaseModel):
 
 
 class PackageModel(BaseModelWithStatus):
-    package_id=models.UUIDField(default=uuid.uuid4(), primary_key=True, max_length=50, editable=False)
+    package_id=models.UUIDField(default=uuid.uuid4(), max_length=50, editable=False)
     title=models.CharField(max_length=100)
     reference_number=models.CharField(max_length=50)
     description=models.TextField(blank=True, null=True)
@@ -59,8 +65,9 @@ class PackageModel(BaseModelWithStatus):
 
     tags=models.ManyToManyField(TagsModel)
 
-    class Meta:
-        unique_together = ['reference_number', 'package_id']
+    def __str__(self) -> str:
+        return self.reference_number
+
 
 
 class PackageCurrencyModel(BaseModelWithStatus):

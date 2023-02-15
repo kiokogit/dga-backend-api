@@ -1,5 +1,8 @@
 import datetime
+
+import django
 from .models import RolesModel
+import os
 
 
 def get_user_roles(user_id):
@@ -9,14 +12,14 @@ def get_user_roles(user_id):
         is_deleted=False
     )
     if user_roles.exists():
-        return user_roles.all()
+        return [role.role for role in user_roles.all()] 
     else:
         return []
 
 
 class CreateUserRoles:
 
-    def __init__(self, user:object, role:str, actor:str) -> None:
+    def __init__(self, user:object, role, actor):
         self.user = user,
         self.role = role,
         self.actor_id = actor
@@ -48,11 +51,12 @@ class CreateUserRoles:
     def add_user_role(self):
         if not self.actor_has_permission():
             return False, "you do not have permission to assign role"
-        
-        __role = RolesModel.objects.filter(
-            user = self.user,
+
+        __roles = RolesModel.objects.filter(    # type: ignore
+            user=self.user,
             role=self.role
-        ).first()
+        )
+        __role = __roles.first()
         if __role:
             if __role.is_active:
                 return False, "user has that role"
@@ -65,7 +69,7 @@ class CreateUserRoles:
 
         try:
             RolesModel.objects.create(
-                user = self.user,
+                user=self.user,
                 role=self.role,
                 is_active=True
             )
@@ -94,3 +98,27 @@ class CreateUserRoles:
         return True, "user role removed successfully"
         
 
+def add_user_role(user, role):
+    
+    __roles = RolesModel.objects.filter(  
+        user=user,
+        role=role
+    )
+    __role = __roles.first()
+    if __role:
+        if __role.is_active:
+            return True
+        else:
+            __role.is_active=True
+            __role.is_deleted=False
+            __role.date_deleted=None
+            __role.save()
+        return True
+
+    RolesModel.objects.create(
+        user=user,
+        role=role,
+        is_active=True
+    )
+
+    return True

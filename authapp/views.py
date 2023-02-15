@@ -1,16 +1,24 @@
-from urllib import response
-from .models import PublicUserAccount, UserModel
+from shared_utils.utils import format_error
+from .models import UserModel
 from . import serializers
 from app import settings
 
+import logging
+
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ViewSet
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from rest_framework.authtoken.models import Token
+
 
 import jwt
 import bcrypt
+
+logger = logging.getLogger(__name__)
 
 class GeneralView(GenericViewSet):
     
@@ -22,7 +30,7 @@ class GeneralView(GenericViewSet):
             'Authorization':access_token
         }
     
-    def get_serializer_context(self, request):
+    def return_serializer_context(self, request):
         headers = self.return_headers(request)
         # decode jwt
         payload = jwt.decode(headers['JWTAUTH'],key=settings.SECRET_KEY, algorithms=['HS256'])
@@ -36,21 +44,26 @@ class GeneralView(GenericViewSet):
     
     @staticmethod
     def get_user_by_email(email, user_type):
-        try:
-            user = UserModel.objects.get(email=email, user_type=user_type)
-            return True, user
-        except UserModel.DoesNotExist:
+        user = UserModel.objects.filter(email=email, user_type=user_type)
+        if user.exists():
+            return True, user.first()
+        else:
             return False, None
 
-class UsersAccountsManagerViewSet(GeneralView):
-    
+class SignUpUser(GeneralView):
+    permission_classes = (AllowAny,)
+
     @action(detail=False, methods=['POST'])
-    def create_user(self, request):
+    def sign_up(self, request):
         # check is user exists
         if not request.data.get('email'):
             return Response({"details": "Email field cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
         
+        exists, instance = self.get_user_by_email(request.data.get('email'), request.data['user_type'])
+        if exists:
+            return Response({"details": "User with that email already exists"}, status=status.HTTP_400_BAD_REQUEST)
         #serialized
+
         if request.data['user_type'] == 'PUBLIC USER':
             serializer = serializers.CreatePublicUserSerializer(
                 data=request.data
@@ -59,7 +72,7 @@ class UsersAccountsManagerViewSet(GeneralView):
         elif request.data['user_type'] == 'INTERNAL STAFF':
             serializer = serializers.CreateInternalStaffUserSerializer(
                 data=request.data,
-                context=self.get_serializer_context(request)
+                context=self.return_serializer_context(request)
             )
         
         else:
@@ -68,29 +81,53 @@ class UsersAccountsManagerViewSet(GeneralView):
             )
             
         if serializer.is_valid():
-            exists, user = self.get_user_by_email(request.data.get('email'), request.data['user_type'])
-            if exists:
-                return Response({"details": "User with that email already exists"}, status=status.HTTP_400_BAD_REQUEST)
+            
             serializer.save()
             
-            return Response({"details":"User created successfully."}, status=status.HTTP_200_OK)
+
+            user = UserModel.objects.get(email=request.data.get('email'))
+
+            token = Token.objects.create(user=user)
+
+            payload = {
+                "user_id": str(user.user_id),
+                "email": user.email,
+                "user_type": user.user_type
+            }
+            jwt_token = jwt.encode(payload=payload, key=settings.SECRET_KEY)
+            # set headers
+            headers = {
+                "JWTAUTH":f'Bearer {jwt_token}',
+                "Authorization":f'Bearer {token}'
+            }
+            
+            return Response({"details":"User created successfully."},headers=headers, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
             # TODO: Format serializer errors to user friendliness
-            return Response({"details":"Invalid data. Cannot create user"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"details":format_error(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['POST'])
-    def login_user(self, request):
+    def change_forgotten_password(self, request):
+        # find user by email link sent
+        pass
+        
+
+class LoginUser(ViewSet):
+    permission_classes = (AllowAny,)
+
+    @action(detail=False, methods=['POST'])
+    def login(self, request):
         
         serializer = serializers.LoginUserSerializer(
             data=request.data
         )
         if not serializer.is_valid():
             print(serializer.errors)
-            return Response({"details": "Invalid User Data"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"details": format_error(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
         
         # get user
-        user_exists, user = self.get_user_by_email(request.data.get('email'), request.data.get('user_type'))
+        user_exists, user = GeneralView.get_user_by_email(request.data.get('email'), request.data.get('user_type'))
         if not user_exists or user is None:
             return Response({"details": "Invalid Email/Password"}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -100,24 +137,32 @@ class UsersAccountsManagerViewSet(GeneralView):
         if not compare:
             return Response({"details": "Invalid Email/Password"}, status=status.HTTP_400_BAD_REQUEST)
         # if exists, get payload for jwt token
+
+        token = Token.objects.filter(user=user).first()
+        if not token:
+            token = Token.objects.create(user=user)
+
         payload = {
-            "user_id": str(user.id),
+            "user_id": str(user.user_id),
             "email": user.email,
             "user_type": user.user_type
         }
         jwt_token = jwt.encode(payload=payload, key=settings.SECRET_KEY)
         # set headers
         headers = {
-            "JWTAUTH":f'Bearer {jwt_token}'
+            "JWTAUTH":f'Bearer {jwt_token}',
+            "Authorization":f'Bearer {token}'
         }
         # pass in as headers
         return Response({"details": "User logged in successfully"}, headers=headers, status=status.HTTP_200_OK)
-        
+       
 
-    @action(detail=False, methods=['POST'])
-    def change_forgotten_password(self, request):
-        # find user by email link sent
-        pass
-        
-   
+class UserRolesViewSet(GenericViewSet):
+
+    permission_classes=(AllowAny)
+
+    @action(methods=['GET'], detail=False)
+    def get_department_roles(self, request):
+
+        return
     
