@@ -16,7 +16,7 @@ ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_EXPOSE_HEADERS = ['JWTAUTH', 'Authorization']
-CORS_ALLOW_HEADERS = ['JWTAUTH', 'Content-Type', 'Authorization']
+CORS_ALLOW_HEADERS = ['JWTAUTH', 'Content-Type', 'Authorization', "Access-Control-Allow-Origin"]
 
 # Application definition
 
