@@ -165,4 +165,11 @@ class UserRolesViewSet(GenericViewSet):
     def get_department_roles(self, request):
 
         return
+
+    @action(methods=['GET'], detail=False)
+    def add_remove_user_role(self, request):
+
+        serializer = None
+
+        return
     

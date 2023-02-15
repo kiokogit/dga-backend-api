@@ -94,7 +94,7 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
                 package_models.PackageImagesModel.objects.create(
                     image=i['image'],
                     description=i['name'],
-                    package_id=self.package.package_id
+                    package_id=self.package.id
                 ) for i in validated_data['images']
             ]
 
@@ -104,7 +104,7 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
                     type=i['type'],
                     amount=i['amount'],
                     currency=i['currency'],
-                    package_id=self.package.package_id
+                    package_id=self.package.id
                 ) for i in validated_data['price']
             ]
 
