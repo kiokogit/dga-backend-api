@@ -20,6 +20,7 @@ CORS_ALLOW_HEADERS = ['JWTAUTH', 'Content-Type', 'Authorization']
 
 # Application definition
 
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
