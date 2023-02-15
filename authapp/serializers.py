@@ -76,14 +76,14 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
     
     def validate(self, data):
         # check user has permission to add specified roles
-        for role in data['roles']:  # type: ignore
-            has_perm = CreateUserRoles(
-                user=None,
-                role=role,
-                actor=self.context['user_id']
-            ).actor_has_permission()
-            if not has_perm:
-                raise serializers.ValidationError(f"You do not have permission to add a user with the role of a {role}.")
+        # for role in data['roles']:  # type: ignore
+        #     has_perm = CreateUserRoles(
+        #         user=None,
+        #         role=role,
+        #         actor=self.context['user_id']
+        #     ).actor_has_permission()
+        #     if not has_perm:
+        #         raise serializers.ValidationError(f"You do not have permission to add a user with the role of a {role}.")
 
         return super().validate(data)
 
@@ -113,14 +113,15 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
             user = UserModel.objects.get(email=validated_data['email'])
 
             for role in validated_data['roles']:  # type: ignore
-                created, message = CreateUserRoles(
-                    user=user,
-                    role=role,
-                    actor=self.context['user_id']
-                ).add_user_role()
+                # created, message = CreateUserRoles(
+                #     user=user,
+                #     role=role,
+                #     actor=self.context['user_id']
+                # ).add_user_role()
+                created = add_user_role(user,role)
 
                 if not created:
-                    raise serializers.ValidationError(message)
+                    raise serializers.ValidationError("Not added role")
         
         return validated_data
 

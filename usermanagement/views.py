@@ -41,7 +41,7 @@ class GeneralView(GenericViewSet):
     
     def get_user_by_id(self, id):
         try:
-            user = UserModel.objects.get(user_id=id)
+            user = UserModel.objects.get(id=id)
         except UserModel.DoesNotExist:
             return None
         return user
