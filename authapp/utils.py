@@ -12,7 +12,7 @@ def get_user_roles(user_id):
         is_deleted=False
     )
     if user_roles.exists():
-        return user_roles.all()
+        return [role.role for role in user_roles.all()] 
     else:
         return []
 
@@ -25,8 +25,6 @@ class CreateUserRoles:
         self.actor_id = actor
 
     def actor_has_permission(self):
-        if not self.actor_id:
-            return True
         if self.role in ["GENERAL MANAGER"]:
             if "SUPER USER" not in get_user_roles(self.actor_id):
                 return False
@@ -50,14 +48,13 @@ class CreateUserRoles:
             return False
 
 
-    def add_user_role(self, user, role):
+    def add_user_role(self):
         if not self.actor_has_permission():
             return False, "you do not have permission to assign role"
 
-        
         __roles = RolesModel.objects.filter(    # type: ignore
-            user=user,
-            role=role
+            user=self.user,
+            role=self.role
         )
         __role = __roles.first()
         if __role:
@@ -72,8 +69,8 @@ class CreateUserRoles:
 
         try:
             RolesModel.objects.create(
-                user=user,
-                role=role,
+                user=self.user,
+                role=self.role,
                 is_active=True
             )
         except Exception:

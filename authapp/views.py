@@ -1,3 +1,4 @@
+from shared_utils.utils import format_error
 from .models import UserModel
 from . import serializers
 from app import settings
@@ -29,7 +30,7 @@ class GeneralView(GenericViewSet):
             'Authorization':access_token
         }
     
-    def get_serializer_context(self, request):
+    def return_serializer_context(self, request):
         headers = self.return_headers(request)
         # decode jwt
         payload = jwt.decode(headers['JWTAUTH'],key=settings.SECRET_KEY, algorithms=['HS256'])
@@ -43,22 +44,14 @@ class GeneralView(GenericViewSet):
     
     @staticmethod
     def get_user_by_email(email, user_type):
-        try:
-            user = UserModel.objects.get(email=email, user_type=user_type)
-            return True, user
-        except UserModel.DoesNotExist:
+        user = UserModel.objects.filter(email=email, user_type=user_type)
+        if user.exists():
+            return True, user.first()
+        else:
             return False, None
 
-class SignUpUser(GenericViewSet):
+class SignUpUser(GeneralView):
     permission_classes = (AllowAny,)
-
-    @staticmethod
-    def get_user_by_email(email, user_type):
-        user = UserModel.objects.filter(email=email, user_type=user_type).exists()
-        if user:
-            return True
-        else:
-            return False
 
     @action(detail=False, methods=['POST'])
     def sign_up(self, request):
@@ -66,7 +59,7 @@ class SignUpUser(GenericViewSet):
         if not request.data.get('email'):
             return Response({"details": "Email field cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
         
-        exists = self.get_user_by_email(request.data.get('email'), request.data['user_type'])
+        exists, instance = self.get_user_by_email(request.data.get('email'), request.data['user_type'])
         if exists:
             return Response({"details": "User with that email already exists"}, status=status.HTTP_400_BAD_REQUEST)
         #serialized
@@ -79,7 +72,7 @@ class SignUpUser(GenericViewSet):
         elif request.data['user_type'] == 'INTERNAL STAFF':
             serializer = serializers.CreateInternalStaffUserSerializer(
                 data=request.data,
-                context=None
+                context=self.return_serializer_context(request)
             )
         
         else:
@@ -90,6 +83,7 @@ class SignUpUser(GenericViewSet):
         if serializer.is_valid():
             
             serializer.save()
+            
 
             user = UserModel.objects.get(email=request.data.get('email'))
 
@@ -111,7 +105,7 @@ class SignUpUser(GenericViewSet):
         else:
             print(serializer.errors)
             # TODO: Format serializer errors to user friendliness
-            return Response({"details":"Invalid data. Cannot create user"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"details":format_error(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['POST'])
     def change_forgotten_password(self, request):
@@ -130,7 +124,7 @@ class LoginUser(ViewSet):
         )
         if not serializer.is_valid():
             print(serializer.errors)
-            return Response({"details": "Invalid User Data"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"details": format_error(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
         
         # get user
         user_exists, user = GeneralView.get_user_by_email(request.data.get('email'), request.data.get('user_type'))
@@ -162,4 +156,13 @@ class LoginUser(ViewSet):
         # pass in as headers
         return Response({"details": "User logged in successfully"}, headers=headers, status=status.HTTP_200_OK)
        
+
+class UserRolesViewSet(GenericViewSet):
+
+    permission_classes=(AllowAny)
+
+    @action(methods=['GET'], detail=False)
+    def get_department_roles(self, request):
+
+        return
     

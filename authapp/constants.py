@@ -15,7 +15,6 @@ ROLES = [
     ("GENERAL MANAGER", "GENERAL MANAGER"),
     ("DIRECTOR", "DIRECTOR"),
     ("GENERAL STAFF", "GENERAL STAFF"),
-    ("SUPER USER", "SUPER USER"),
     ("CEO", "CEO")
 ]
 
@@ -31,3 +30,79 @@ INDUSTRY_TYPES = [
     ("TRAVEL AND TOURS", "TRAVEL AND TOURS"),
     ("TRANSPORTATION", "TRANSPORTATION")
 ]
+
+ALL_ROLES = [
+    "ICT OFFICER",
+    "DIRECTOR",
+    "DATA CLERK",
+    "TOUR GUIDE"
+]
+
+DEPARTMENT_HEADS_ROLES = [
+    "CHIEF ICT OFFICER",
+    "GENERAL MANAGER",
+    "CHIEF CUSTOMER CARE OFFICER",
+    "CEO"
+]
+
+SYSTEM_ADMINS_ROLES = [
+    "ICT OFFICER"
+]
+
+DATA_ENTRY_ROLES = [
+    "DATA CLERK"
+]
+
+
+DEPARTMENTS_ROLES_DATA = [
+    {
+        "department":"ICT",
+        "department_head":"CHIEF ICT OFFICER",
+        "department_roles":[
+            "ICT OFFICER",
+            "DATA CLERK",
+            "DEVELOPER"
+        ]
+    },
+    {
+        "department":"CUSTOMER CARE",
+        "department_head":"CHIEF CUSTOMER CARE OFFICER",
+        "department_roles":[
+            "CHIEF CUSTOMER CARE OFFICER"
+            "CUSTOMER CARE",
+            "CALL CENTER OFFICERS"
+        ]
+    },
+    {
+        "department":"EXECUTIVE",
+        "department_head":"GENERAL MANAGER",
+        "department_roles":[
+            "CEO",
+            "FINANCE OFFICER",
+            "DIRECTOR",
+            "CHIEF CUSTOMER CARE OFFICER",
+            "BOOKING MANAGER",
+            "CHIEF ICT OFFICER"
+        ]
+    },
+    {
+        "department":"BOOKING",
+        "department_head":"BOOKING MANAGER",
+        "department_roles":[
+            "BOOKING MANAGER",
+            "BOOKING OFFICER",
+            "BOOKING ASSISTANT"
+        ]
+    },
+    {
+        "department":"BUSINESS AND MARKETING",
+        "department_head":"CEO",
+        "department_roles":[
+            "MARKETING OFFICER",
+            "FIELD OFFICER",
+            "CASUAL"
+        ]
+    }
+]
+
+

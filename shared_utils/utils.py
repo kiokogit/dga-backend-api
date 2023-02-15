@@ -87,3 +87,42 @@ def generate_package_ref():
 
 def generate_process_ref(process_code:str):
     return process_code + "23"+ "/" + str(random.randint(0, 2000))
+
+
+def format_error(errors_):
+    """
+    output it all on a string
+    """
+    errors = errors_.items()
+    if len(errors) > 0:
+        error_message = ''
+        for i in errors_.items():
+            # if isinstance(i[1], dict):
+            #     key_ = tuple(i[1].keys())[0]
+            #     value = i[1][key_]
+            #     for j in value:
+            #         if 'non_field_errors' == j:
+            #             return '%s: %s' % (i[0], value[j][0])
+            #         else:
+            #             try:
+            #                 return '%s: %s: %s' % (i[0], j, value[j][0])
+            #             except:
+            #                 return '%s: %s: %s' % (i[0], j, value[0])
+            #     break
+            if isinstance(i[1][0], list):
+                secondary_strings = ''
+                for j in i[1][0]:
+                    secondary_strings += j + ' '
+                error_message = i[0] + ": " + secondary_strings
+            else:
+                if 'non_field_errors' == i[0]:
+                    error_message = i[1][0]
+                elif isinstance(i[1][0], dict):
+                    key_ = tuple(i[1][0].keys())[0]
+                    value = i[1][0][key_][0]
+                    error_message = i[0] + ": " + '%s: %s' % (key_, value)
+                else:
+                    error_message = i[0] + ": " + i[1][0]
+            break
+        return error_message
+    return ''

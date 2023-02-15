@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from django.db import transaction
 from .utils import CreateUserRoles, add_user_role
 from .models import ContactsModel, PublicUserAccount, StaffUserAccount, RolesModel, UserModel
 import bcrypt
@@ -75,6 +75,16 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
 
     
     def validate(self, data):
+        # check user has permission to add specified roles
+        for role in data['roles']:  # type: ignore
+            has_perm = CreateUserRoles(
+                user=None,
+                role=role,
+                actor=self.context['user_id']
+            ).actor_has_permission()
+            if not has_perm:
+                raise serializers.ValidationError(f"You do not have permission to add a user with the role of a {role}.")
+
         return super().validate(data)
 
     def create(self, validated_data):
@@ -83,33 +93,34 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
             validated_data['is_admin'] = True
 
         # # try:
-        user = UserModel.objects.create(
-            first_name=validated_data["first_name"],
-            last_name=validated_data["last_name"],
-            middle_name=validated_data["middle_name"],
-            password=validated_data["password"],
-            email=validated_data["email"],
-            user_type=validated_data['user_type']
-        )
+        with transaction.atomic():
 
-        StaffUserAccount.objects.create(
-            user=user,
-            is_admin=validated_data["is_admin"],
-            is_superuser=validated_data["is_superuser"],
-            is_general_staff=validated_data["is_general_staff"]
-        )
+            user = UserModel.objects.create(
+                first_name=validated_data["first_name"],
+                last_name=validated_data["last_name"],
+                middle_name=validated_data["middle_name"],
+                password=validated_data["password"],
+                email=validated_data["email"],
+                user_type=validated_data['user_type']
+            )
 
-        # # except Exception as e:
-        # #     print(e.)
-        # #     raise serializers.ValidationError("There was an error creating staff user")
+            StaffUserAccount.objects.create(
+                user=user,
+                is_admin=validated_data["is_admin"],
+                is_superuser=validated_data["is_superuser"],
+                is_general_staff=validated_data["is_general_staff"]
+            )
+            user = UserModel.objects.get(email=validated_data['email'])
 
-        user = UserModel.objects.get(email=validated_data['email'])
+            for role in validated_data['roles']:  # type: ignore
+                created, message = CreateUserRoles(
+                    user=user,
+                    role=role,
+                    actor=self.context['user_id']
+                ).add_user_role()
 
-        for role in validated_data['roles']:  # type: ignore
-            created = add_user_role(user=user, role=role)
-
-            if not created:
-                raise serializers.ValidationError("not added")
+                if not created:
+                    raise serializers.ValidationError(message)
         
         return validated_data
 
