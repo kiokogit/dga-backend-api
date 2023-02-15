@@ -18,7 +18,7 @@ class PublicUserDetailsSerializer(PublicUserBasicDetails):
     
     class Meta(PublicUserBasicDetails.Meta):
         fields= PublicUserBasicDetails.Meta.fields + [
-            "user_id",
+            "id",
             "user_type",
             "date_created",
             "is_active",
