@@ -90,7 +90,7 @@ class SignUpUser(GeneralView):
             token = Token.objects.create(user=user)
 
             payload = {
-                "user_id": str(user.user_id),
+                "user_id": str(user.id),
                 "email": user.email,
                 "user_type": user.user_type
             }
@@ -143,7 +143,7 @@ class LoginUser(ViewSet):
             token = Token.objects.create(user=user)
 
         payload = {
-            "user_id": str(user.user_id),
+            "user_id": str(user.id),
             "email": user.email,
             "user_type": user.user_type
         }

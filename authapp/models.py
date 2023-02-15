@@ -7,6 +7,7 @@ from .constants import USER_TYPES, ROLES
 
 # basic model
 class BaseModel(models.Model):
+    id=models.UUIDField(default=uuid.uuid4, max_length=50, editable=False, primary_key=True)
     date_created=models.DateTimeField(auto_now=True) 
     date_modified=models.DateTimeField(auto_now_add=True)
 
@@ -36,7 +37,6 @@ class BaseUserModel(BaseModelWithStatus, AbstractBaseUser):
 
 # basic user
 class UserModel(BaseUserModel):
-    user_id=models.UUIDField(default=uuid.uuid4(), max_length=50, editable=False)
     first_name=models.CharField(max_length=50, null=True, blank=True)
     middle_name=models.CharField(max_length=50, null=True, blank=True)
     last_name=models.CharField(max_length=50, null=True, blank=True)
@@ -52,12 +52,12 @@ class UserModel(BaseUserModel):
     
     
 # public user
-class PublicUserAccount(models.Model):
+class PublicUserAccount(BaseModelWithStatus):
     user=models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='public_account')
 
 
 # staff user
-class StaffUserAccount(models.Model):
+class StaffUserAccount(BaseModelWithStatus):
     user=models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='staff_account')
     is_admin=models.BooleanField(default=False)
     is_superuser=models.BooleanField(default=False)
@@ -65,7 +65,7 @@ class StaffUserAccount(models.Model):
 
     
 # Organization account
-class OrganizationAccount(models.Model):
+class OrganizationAccount(BaseModelWithStatus):
     user=models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='organization_account')
     name=models.CharField(max_length=255)
     industry=models.CharField(max_length=255)
@@ -73,7 +73,6 @@ class OrganizationAccount(models.Model):
 
 # otp model
 class OTPVerification(BaseModelWithStatus):
-    user=models.ForeignKey(UserModel, related_name="otp_verification", on_delete=models.CASCADE) 
     verified=models.CharField(max_length=255, null=True, blank=True)
     otp_code=models.CharField(max_length=255, null=True, blank=True)
     mode=models.CharField(max_length=255, null=True, blank=True)
@@ -99,7 +98,7 @@ class RolesModel(BaseModelWithStatus):
     role=models.CharField(max_length=25, choices=ROLES, default="GENERAL STAFF")
 
 # user contacts
-class ContactsModel(models.Model):
+class ContactsModel(BaseModelWithStatus):
     user=models.ForeignKey(UserModel, related_name="contact_details", on_delete=models.CASCADE)
     phone_number=models.CharField(max_length=50, null=True, blank=True)
     is_phone_number_verified=models.BooleanField(default=False)

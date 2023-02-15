@@ -12,6 +12,7 @@ PRICE_TYPES = [
 
 # basic model
 class BaseModel(models.Model):
+    id=models.UUIDField(default=uuid.uuid4, max_length=50, editable=False, primary_key=True)
     date_created=models.DateTimeField(auto_now_add=True, null=True, blank=True) 
     date_modified=models.DateTimeField(auto_now=True, null=True, blank=True)
 
@@ -33,7 +34,6 @@ class TagsModel(BaseModel):
 
 
 class PackageModel(BaseModelWithStatus):
-    package_id=models.UUIDField(default=uuid.uuid4(), max_length=50, editable=False)
     title=models.CharField(max_length=100)
     reference_number=models.CharField(max_length=50)
     description=models.TextField(blank=True, null=True)
