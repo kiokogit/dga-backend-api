@@ -50,16 +50,8 @@ class GeneralView(GenericViewSet):
         else:
             return False, None
 
-class SignUpUser(GenericViewSet):
+class SignUpUser(GeneralView):
     permission_classes = (AllowAny,)
-
-    @staticmethod
-    def get_user_by_email(email, user_type):
-        user = UserModel.objects.filter(email=email, user_type=user_type)
-        if user.exists():
-            return True, user.first()
-        else:
-            return False, None
 
     @action(detail=False, methods=['POST'])
     def sign_up(self, request):
@@ -80,7 +72,7 @@ class SignUpUser(GenericViewSet):
         elif request.data['user_type'] == 'INTERNAL STAFF':
             serializer = serializers.CreateInternalStaffUserSerializer(
                 data=request.data,
-                context=None
+                context=self.return_serializer_context(request)
             )
         
         else:
