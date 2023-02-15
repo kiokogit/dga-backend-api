@@ -6,6 +6,6 @@ try:
 except ImportError:
     try:
         from .production import *
-        DEBUG = False
+        DEBUG = True
     except ImportError:
         DEBUG = True
