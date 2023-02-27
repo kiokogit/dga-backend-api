@@ -2,67 +2,55 @@ import datetime
 
 import django
 from django.conf import settings
-from .models import RolesModel
+from .models import DepartmentModel, RolesModel, UserModel
 import os
 
 
-def get_user_roles(user_id):
-    user_roles = RolesModel.objects.filter(
-        user__id=user_id,
+def get_user_roles(user):
+    user_roles = user.roles.filter(
         is_active=True,
         is_deleted=False
     )
     if user_roles.exists():
-        return [role.role for role in user_roles.all()] 
+        return [role for role in user_roles.all()] 
     else:
         return []
 
 
 class CreateUserRoles:
 
-    def __init__(self, user:object, role:str, actor:str):
+    def __init__(self, user:object, role, actor:str, department_id):
         self.user = user
         self.role = role
         self.actor_id = actor
+        self.department_id = department_id
+        self.actor = UserModel.objects.get(id=actor)
 
     def actor_has_permission(self):
-        if settings.DEBUG:
-            return True
-        if self.role in ["GENERAL MANAGER"]:
-            if "SUPER USER" not in get_user_roles(self.actor_id):
-                return False
-            else:
-                return True
-
-        elif self.role in ["FINANCE OFFICER", "BOOKING MANAGER", "BOOKING OFFICER", "ICT OFFICER", "TOUR GUIDE", "DATA CLERK"]:
-            if "DIRECTOR" not in get_user_roles(self.actor_id):
-                return False
-            else:
-                 return True
-
-        elif self.role in ["CUSTOMER CARE", "GENERAL STAFF", "DATA CLERK"]:
-            if "ICT OFFICER" not in get_user_roles(self.actor_id):
-                return False
-            else:
-                return True
+        # if settings.DEBUG:
+        #     return True
+        # must be department head
+        department = DepartmentModel.objects.get(id=self.department_id)
+        if not self.actor.roles.filter(
+            department=department,
+            is_department_head=True
+        ).exists():
+            return False
+        
+        # department head can only be added by the executive branch
+        if self.role in RolesModel.objects.filter(department__name=='EXECUTIVE').all() and not len([role for role in get_user_roles(self.actor) if role.role=="GENERAL MANAGER"]) > 0: #type:ignore
+            return False
 
         else:
-            # User has no permission at all
-            return False
+            return True
 
 
     def add_user_role(self):
-        if not self.actor_has_permission():
-            return False, "you do not have permission to assign role"
-        
-        role = RolesModel.objects.filter(
-            role=self.role
-        ).first()
-        if not role:
-            return False, f'{self.role} is not defined in the system. Contact customer care for assistance'
+        if not self.role:
+            return False, f'{self.role.role} is not defined in the system. Contact customer care for assistance'
 
         __roles = self.user.roles.filter(    # type: ignore
-            role=self.role
+            id=self.role.id
         )   
         __role = __roles.first()
         if __role:
@@ -76,8 +64,9 @@ class CreateUserRoles:
             return True, "Role updated successfully"
         else:
             try:
-                self.user.roles.add(role) # type: ignore
-            except Exception:
+                self.user.roles.add(self.role) # type: ignore
+            except Exception as e:
+                print(e)
                 return False, "role not added"
 
 

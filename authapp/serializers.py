@@ -76,19 +76,21 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
     
     def validate(self, data):
         # check user has permission to add specified roles
-        for role in data['roles']:  # type: ignore
+        for role_id in data['roles']:  # type: ignore
+            role_instance = RolesModel.objects.get(id=role_id)
             has_perm = CreateUserRoles(
                 user=None,
-                role=role,
-                actor=self.context['user_id']
+                role=role_instance,
+                actor=self.context['user_id'],
+                department_id=role_instance.department.id # type: ignore
             ).actor_has_permission()
             if not has_perm:
-                raise serializers.ValidationError(f"You do not have permission to add a user with the role of a {role}.")
+                raise serializers.ValidationError(f"You do not have permission to add a user with the role of a {role_instance.role}.")
 
         return super().validate(data)
 
     def create(self, validated_data):
-        if "ICT OFFICER" in validated_data['roles']:
+        if "CHIEF ICT OFFICER" in validated_data['roles']:
             validated_data['is_superuser'] = True
             validated_data['is_admin'] = True
 
@@ -109,11 +111,13 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
 
             user = UserModel.objects.get(email=validated_data['email'])
 
-            for role in validated_data['roles']:  # type: ignore
+            for role_id in validated_data['roles']:  # type: ignore
+                role_instance = RolesModel.objects.get(id=role_id)
                 created, message = CreateUserRoles(
                     user=user,
-                    role=role,
-                    actor=self.context['user_id']
+                    role=role_instance,
+                    actor=self.context['user_id'],
+                    department_id=role_instance.department.id #type:ignore
                 ).add_user_role()
 
                 if not created:

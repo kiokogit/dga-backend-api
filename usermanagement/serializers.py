@@ -56,14 +56,37 @@ class PublicUserDetailsSerializer(PublicUserBasicDetails):
 
 class UserRolesSerializer(serializers.ModelSerializer):
     department = serializers.SerializerMethodField(read_only=True)
+    department_id = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = models.RolesModel
         fields=[
             "role",
             "is_department_head",
             'id',
-            'department'
+            'department',
+            'department_id'
         ]
 
     def get_department(self, obj):
         return obj.department.name
+    
+    def get_department_id(self, obj):
+        return obj.department.id
+    
+class DepartmentDetailsSerializer(serializers.ModelSerializer):
+    roles = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = models.DepartmentModel
+        fields=[
+            'name',
+            'id',
+            'roles'
+        ]
+
+    def get_roles(self, obj):
+
+        return UserRolesSerializer(
+            obj.department_roles,
+            many=True
+        ).data
