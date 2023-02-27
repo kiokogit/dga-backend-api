@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DBNAME'),
+        'NAME': os.environ.get('DBNAME'),
         'USER': os.environ.get('DBUSER'),
         'PASSWORD': os.environ.get('DBPASS'),
         'CONN_MAX_AGE': 1000,
