@@ -171,14 +171,15 @@ class AddRemoveUserRolesSerializer(serializers.Serializer):
         return super().validate(attrs)
 
     def create(self, validated_data):
-        departments = DepartmentModel.objects.all()
-        for department in departments:
-            [RolesModel.objects.create(
-                role=i['role'],
-                department=department,
-                is_primary_role=i['is_primary_role'],
-                is_department_head=i['is_department_head']
-            ) for i in validated_data['roles'] if department.name==i['department']
-            ]
+        with transaction.atomic():
+            departments = DepartmentModel.objects.all()
+            for department in departments:
+                [RolesModel.objects.create(
+                    role=i['role'],
+                    department=department,
+                    is_primary_role=i['is_primary_role'],
+                    is_department_head=i['is_department_head']
+                ) for i in validated_data['roles'] if (department.name==i['department'] and not RolesModel.objects.filter(role=i['role']).exists())
+                ]
 
         return super().create(validated_data)

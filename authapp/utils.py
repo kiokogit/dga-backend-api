@@ -1,6 +1,7 @@
 import datetime
 
 import django
+from django.conf import settings
 from .models import RolesModel
 import os
 
@@ -19,12 +20,14 @@ def get_user_roles(user_id):
 
 class CreateUserRoles:
 
-    def __init__(self, user:object, role, actor):
-        self.user = user,
-        self.role = role,
+    def __init__(self, user:object, role:str, actor:str):
+        self.user = user
+        self.role = role
         self.actor_id = actor
 
     def actor_has_permission(self):
+        if settings.DEBUG:
+            return True
         if self.role in ["GENERAL MANAGER"]:
             if "SUPER USER" not in get_user_roles(self.actor_id):
                 return False
@@ -44,37 +47,39 @@ class CreateUserRoles:
                 return True
 
         else:
-            # No such a role
+            # User has no permission at all
             return False
 
 
     def add_user_role(self):
         if not self.actor_has_permission():
             return False, "you do not have permission to assign role"
-
-        __roles = RolesModel.objects.filter(    # type: ignore
-            user=self.user,
+        
+        role = RolesModel.objects.filter(
             role=self.role
-        )
+        ).first()
+        if not role:
+            return False, f'{self.role} is not defined in the system. Contact customer care for assistance'
+
+        __roles = self.user.roles.filter(    # type: ignore
+            role=self.role
+        )   
         __role = __roles.first()
         if __role:
             if __role.is_active:
-                return False, "user has that role"
+                pass
             else:
                 __role.is_active=True
                 __role.is_deleted=False
                 __role.date_deleted=None
                 __role.save()
             return True, "Role updated successfully"
+        else:
+            try:
+                self.user.roles.add(role) # type: ignore
+            except Exception:
+                return False, "role not added"
 
-        try:
-            RolesModel.objects.create(
-                user=self.user,
-                role=self.role,
-                is_active=True
-            )
-        except Exception:
-            return False, "role not added"
 
         return True, "role added successfully to user"
 
