@@ -22,3 +22,4 @@ tzdata==2022.6
 urllib3==1.26.13
 virtualenv==20.17.0
 yarg==0.1.9
+psycopg2-binary==2.8.6
