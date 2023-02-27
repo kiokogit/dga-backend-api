@@ -6,8 +6,8 @@ from rest_framework import status
 from app import settings
 from authapp.serializers import CreateUserGeneralSerializer
 
-from .serializers import PublicUserBasicDetails, PublicUserDetailsSerializer, UserRolesSerializer
-from authapp.models import UserModel
+from .serializers import DepartmentDetailsSerializer, PublicUserBasicDetails, PublicUserDetailsSerializer, UserRolesSerializer
+from authapp.models import DepartmentModel, UserModel
 import jwt
 
 # Create your views here.
@@ -113,6 +113,19 @@ class PublicAccountsViewSet(GeneralView):
         )
         return Response(serialized.data)
 
-    
+
+class GeneralAccountsView(GeneralView):
+
+
+    @action(detail=False, methods=['GET'])
+    def get_department_roles(self, request):
+        department = DepartmentModel.objects.get(id=request.query_params.get('id'))
+
+        serializer =  DepartmentDetailsSerializer(
+            department,
+            many=False
+        )
+
+        return Response(serializer.data)
 
     

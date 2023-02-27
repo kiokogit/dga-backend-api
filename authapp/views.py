@@ -72,7 +72,7 @@ class SignUpUser(GeneralView):
         elif request.data['user_type'] == 'INTERNAL STAFF':
             serializer = serializers.CreateInternalStaffUserSerializer(
                 data=request.data,
-                context=self.return_serializer_context(request) if not settings.DEBUG else {'user_id':None}
+                context=self.return_serializer_context(request)
             )
         
         else:
@@ -85,23 +85,23 @@ class SignUpUser(GeneralView):
             serializer.save()
             
 
-            user = UserModel.objects.get(email=request.data.get('email'))
+            # user = UserModel.objects.get(email=request.data.get('email'))
 
-            token = Token.objects.create(user=user)
+            # token = Token.objects.create(user=user)
 
-            payload = {
-                "user_id": str(user.id),
-                "email": user.email,
-                "user_type": user.user_type
-            }
-            jwt_token = jwt.encode(payload=payload, key=settings.SECRET_KEY)
-            # set headers
-            headers = {
-                "JWTAUTH":f'Bearer {jwt_token}',
-                "Authorization":f'Bearer {token}'
-            }
+            # payload = {
+            #     "user_id": str(user.id),
+            #     "email": user.email,
+            #     "user_type": user.user_type
+            # }
+            # jwt_token = jwt.encode(payload=payload, key=settings.SECRET_KEY)
+            # # set headers
+            # headers = {
+            #     "JWTAUTH":f'Bearer {jwt_token}',
+            #     "Authorization":f'Bearer {token}'
+            # }
             
-            return Response({"details":"User created successfully."},headers=headers, status=status.HTTP_200_OK)
+            return Response({"details":"User created successfully."}, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
             # TODO: Format serializer errors to user friendliness
