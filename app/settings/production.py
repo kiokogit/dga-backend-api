@@ -18,22 +18,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DATABASE_NAME'),
-        'USER': os.environ.get('DATABASE_USERNAME'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+        'NAME': os.getenv('DBNAME'),
+        'USER': os.environ.get('DBUSER'),
+        'PASSWORD': os.environ.get('DBPASS'),
         'CONN_MAX_AGE': 1000,
         'OPTIONS': {
-            'options': '-c search_path={}'.format(os.environ.get('DATABASE_SCHEMA'))
+            'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
         },
-        'HOST': str(os.environ.get('DATABASE_HOST')),
-        'PORT': int(os.environ.get('DATABASE_PORT')), #type: ignore
+        'HOST': str(os.environ.get('DBHOST')),
+        'PORT': int(os.environ.get('DBPORT')), #type: ignore
         'TEST': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ.get('DATABASE_NAME'),
-            'USER': os.environ.get('DATABASE_USERNAME'),
-            'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
+            'NAME': os.environ.get('DBNAME'),
+            'USER': os.environ.get('DBUSER'),
+            'PASSWORD': os.environ.get('DBPASS'),
             'OPTIONS': {
-                'options': '-c search_path={}'.format(os.environ.get('DATABASE_SCHEMA'))
+                'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
             },
 
         },
