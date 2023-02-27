@@ -72,7 +72,7 @@ class SignUpUser(GeneralView):
         elif request.data['user_type'] == 'INTERNAL STAFF':
             serializer = serializers.CreateInternalStaffUserSerializer(
                 data=request.data,
-                context=self.return_serializer_context(request)
+                context=self.return_serializer_context(request) if not settings.DEBUG else {'user_id':None}
             )
         
         else:
