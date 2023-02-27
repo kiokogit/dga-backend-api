@@ -28,7 +28,7 @@ DATABASES = {
         'HOST': str(os.environ.get('DBHOST')),
         'PORT': int(os.environ.get('DBPORT')), #type: ignore
         'TEST': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': os.environ.get('DBNAME'),
             'USER': os.environ.get('DBUSER'),
             'PASSWORD': os.environ.get('DBPASS'),
