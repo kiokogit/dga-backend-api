@@ -15,6 +15,7 @@ class PublicUserBasicDetails(serializers.ModelSerializer):
 class PublicUserDetailsSerializer(PublicUserBasicDetails):
     contact_details = serializers.SerializerMethodField(read_only=True)
     residential_address = serializers.SerializerMethodField(read_only=True)
+    roles = serializers.SerializerMethodField(read_only=True)
     
     class Meta(PublicUserBasicDetails.Meta):
         fields= PublicUserBasicDetails.Meta.fields + [
@@ -26,7 +27,10 @@ class PublicUserDetailsSerializer(PublicUserBasicDetails):
             "is_email_verified",
             "is_sms_verified",
             "contact_details",
-            "residential_address"
+            "residential_address",
+            "roles",
+            "department_id",
+            "profile_pic"
         ]
     
     def get_contact_details(self, obj):
@@ -39,18 +43,22 @@ class PublicUserDetailsSerializer(PublicUserBasicDetails):
             return "None"
         
     def get_residential_address(self, obj):
-        address = models.ResidentialAddress.objects.filter(
-            user__email=obj.email
-        )
-        if address.exists():
-            return address[0]
-        else:
-            return "No Entry"
+        
+        return "No Entry"
+
+    def get_roles(self, obj):
+        roles = obj.roles.filter(is_active=True)
+        return UserRolesSerializer(
+            roles,
+            many=True
+        ).data
+
 
 class UserRolesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.RolesModel
         fields=[
             "role",
-            "is_active"
+            "is_department_head",
+            'id'
         ]

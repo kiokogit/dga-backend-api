@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.db import transaction
 from .utils import CreateUserRoles, add_user_role
-from .models import ContactsModel, PublicUserAccount, StaffUserAccount, RolesModel, UserModel
+from .models import ContactsModel, DepartmentModel, RolesModel, UserModel
 import bcrypt
 
 class CreateUserGeneralSerializer(serializers.Serializer):
@@ -46,7 +46,7 @@ class CreatePublicUserSerializer(CreateUserGeneralSerializer):
     def create(self, validated_data):
         
         try:
-            PublicUserAccount.objects.create(
+            UserModel.objects.create(
                 **validated_data
             )
         except Exception:
@@ -101,15 +101,12 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
                 middle_name=validated_data["middle_name"],
                 password=validated_data["password"],
                 email=validated_data["email"],
-                user_type=validated_data['user_type']
-            )
-
-            StaffUserAccount.objects.create(
-                user=user,
+                user_type=validated_data['user_type'],
                 is_admin=validated_data["is_admin"],
                 is_superuser=validated_data["is_superuser"],
                 is_general_staff=validated_data["is_general_staff"]
             )
+
             user = UserModel.objects.get(email=validated_data['email'])
 
             for role in validated_data['roles']:  # type: ignore
@@ -144,3 +141,44 @@ class LoginUserSerializer(serializers.Serializer):
         
         return attrs
     
+
+class AddDepartmentSerializer(serializers.Serializer):
+    names = serializers.ListField(
+        child=serializers.CharField()
+    )
+
+
+    def create(self, validated_data):
+
+        [ DepartmentModel.objects.create(
+            name=name
+        ) for name in validated_data['names']]
+
+        return validated_data
+
+
+
+class AddRemoveUserRolesSerializer(serializers.Serializer):
+    # user_id = serializers.UUIDField()
+    # role_id = serializers.UUIDField()
+    # add_remove = serializers.CharField()
+    roles = serializers.ListField(
+        child=serializers.DictField()
+    )
+
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        departments = DepartmentModel.objects.all()
+        for department in departments:
+            [RolesModel.objects.create(
+                role=i['role'],
+                department=department,
+                is_primary_role=i['is_primary_role'],
+                is_department_head=i['is_department_head']
+            ) for i in validated_data['roles'] if department.name==i['department']
+            ]
+
+        return super().create(validated_data)

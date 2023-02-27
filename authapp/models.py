@@ -23,6 +23,17 @@ class BaseModelWithStatus(BaseModel):
     class Meta:
         abstract = True
 
+    
+class DepartmentModel(BaseModelWithStatus):
+    name=models.CharField(max_length=100, unique=True)
+
+# user roles
+class RolesModel(BaseModelWithStatus):
+    role=models.CharField(max_length=100, null=True, blank=True, unique=True)
+    is_department_head=models.BooleanField(default=False)
+    is_primary_role=models.BooleanField(default=False)
+
+    department=models.ForeignKey(DepartmentModel, related_name="department_roles", on_delete=models.CASCADE, null=True, blank=True)
 
 # basic user model
 class BaseUserModel(BaseModelWithStatus, AbstractBaseUser):
@@ -40,8 +51,17 @@ class UserModel(BaseUserModel):
     first_name=models.CharField(max_length=50, null=True, blank=True)
     middle_name=models.CharField(max_length=50, null=True, blank=True)
     last_name=models.CharField(max_length=50, null=True, blank=True)
-    user_type=models.CharField(max_length=25, default="PUBLIC USER", choices=USER_TYPES)
+    profile_pic=models.TextField(null=True, blank=True)
 
+    user_type=models.CharField(max_length=25, default="PUBLIC USER", choices=USER_TYPES)
+    is_admin=models.BooleanField(default=False)
+    is_superuser=models.BooleanField(default=False)
+    is_general_staff=models.BooleanField(default=False)
+    
+    roles=models.ManyToManyField(RolesModel, related_name='user_roles')
+    department_id=models.UUIDField(blank=True, max_length=50, null=True)
+
+ # type: ignore
     REQUIRED_FIELDS = [
         'password',
         'user_type'
@@ -49,30 +69,10 @@ class UserModel(BaseUserModel):
 
     USERNAME_FIELD = 'email'
 
-    
-    
-# public user
-class PublicUserAccount(BaseModelWithStatus):
-    user=models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='public_account')
-
-
-# staff user
-class StaffUserAccount(BaseModelWithStatus):
-    user=models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='staff_account')
-    is_admin=models.BooleanField(default=False)
-    is_superuser=models.BooleanField(default=False)
-    is_general_staff=models.BooleanField(default=False)
-
-    
-# Organization account
-class OrganizationAccount(BaseModelWithStatus):
-    user=models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='organization_account')
-    name=models.CharField(max_length=255)
-    industry=models.CharField(max_length=255)
-
 
 # otp model
 class OTPVerification(BaseModelWithStatus):
+    user=models.ForeignKey(UserModel, related_name='otps', blank=True, null=True, on_delete=models.CASCADE) 
     verified=models.CharField(max_length=255, null=True, blank=True)
     otp_code=models.CharField(max_length=255, null=True, blank=True)
     mode=models.CharField(max_length=255, null=True, blank=True)
@@ -92,10 +92,6 @@ class ResidentialAddress(BaseModelWithStatus):
     geo_location=models.TextField(blank=True, null=True)
     
 
-# user roles
-class RolesModel(BaseModelWithStatus):
-    user=models.ForeignKey(UserModel, related_name="roles", on_delete=models.CASCADE)
-    role=models.CharField(max_length=25, choices=ROLES, default="GENERAL STAFF")
 
 # user contacts
 class ContactsModel(BaseModelWithStatus):
@@ -113,5 +109,3 @@ class ProfessionalUpgradesModel(BaseModelWithStatus):
     user = models.ForeignKey(UserModel, related_name="professional_upgrade", on_delete=models.CASCADE)
     professional_account = models.ForeignKey(ProfessionalAccountsModel, related_name='professional_accounts', on_delete=models.CASCADE)
     upgraded_by = models.CharField(max_length=50, null=True, blank=True)
-
-
