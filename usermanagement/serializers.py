@@ -55,10 +55,15 @@ class PublicUserDetailsSerializer(PublicUserBasicDetails):
 
 
 class UserRolesSerializer(serializers.ModelSerializer):
+    department = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = models.RolesModel
         fields=[
             "role",
             "is_department_head",
-            'id'
+            'id',
+            'department'
         ]
+
+    def get_department(self, obj):
+        return obj.department.name
