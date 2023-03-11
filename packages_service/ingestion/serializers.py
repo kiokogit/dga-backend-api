@@ -93,7 +93,7 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
             [
                 package_models.PackageImagesModel.objects.create(
                     image=i['image'],
-                    description=i['name'],
+                    description=i['description'],
                     package_id=self.package.id
                 ) for i in validated_data['images']
             ]
@@ -122,7 +122,7 @@ class EditPackageSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         try:
-            package_instance = package_models.PackageModel.objects.filter(package_id=attrs['package']['package_id'])
+            package_instance = package_models.PackageModel.objects.filter(id=attrs['package']['package_id'])
 
         except package_models.PackageModel.DoesNotExist or TypeError:
             raise serializers.ValidationError("Package does not exist. Wrong ID passed")
@@ -132,7 +132,7 @@ class EditPackageSerializer(serializers.Serializer):
     def create(self, validated_data):
         print(validated_data)
         try:
-            package_instance = package_models.PackageModel.objects.filter(package_id=validated_data['package']['package_id'])
+            package_instance = package_models.PackageModel.objects.filter(id=validated_data['package']['package_id'])
 
         except package_models.PackageModel.DoesNotExist or TypeError:
             raise serializers.ValidationError("Package does not exist. Wrong ID passed")
@@ -144,7 +144,7 @@ class EditPackageSerializer(serializers.Serializer):
             print(e)
         images = validated_data['images']
         current_images = package_models.PackageImagesModel.objects.filter(
-            package_id=package_instance.first().package_id  # type:ignore
+            id=package_instance.first().package_id  # type:ignore
         ).all()
         for i in current_images:
             if i not in images:
@@ -153,7 +153,7 @@ class EditPackageSerializer(serializers.Serializer):
         for i in images:
             if i not in current_images:
                 package_models.PackageImagesModel.objects.create(
-                    package_id=package_instance.first().package_id  # type:ignore
+                    id=package_instance.first().package_id  # type:ignore
                     **i
                 )
             

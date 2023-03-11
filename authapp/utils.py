@@ -1,9 +1,13 @@
 import datetime
-
+import random
+from django.core.mail import send_mail
 import django
 from django.conf import settings
 from .models import DepartmentModel, RolesModel, UserModel
 import os
+
+from django.core import mail
+            
 
 
 def get_user_roles(user):
@@ -38,7 +42,7 @@ class CreateUserRoles:
             return False
         
         # department head can only be added by the executive branch
-        if self.role in RolesModel.objects.filter(department__name=='EXECUTIVE').all() and not len([role for role in get_user_roles(self.actor) if role.role=="GENERAL MANAGER"]) > 0: #type:ignore
+        if self.role in RolesModel.objects.filter(department__name='EXECUTIVE').all() and not len([role for role in get_user_roles(self.actor) if role.role=="GENERAL MANAGER"]) > 0: #type:ignore
             return False
 
         else:
@@ -116,3 +120,58 @@ def add_user_role(user, role):
     )
 
     return True
+
+
+def validate_email(email:str):
+
+    if not (email.__contains__('@') 
+            and len(email) < 254 
+            and len(email) > 15 
+            and email.split('@')[1].__contains__('.')
+            ):
+        return False
+    return True
+
+
+def validate_password(passw:str):
+
+    if not (len(passw) < 8
+    ):
+        return False
+    
+    return True
+
+
+def generate_random_password():
+
+    characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890qwertyuiopasdgfhjklzxcvbnm'
+
+    charactersLength = len(characters)
+    result = ''
+    for i in range(0, 8):
+        result += characters[round(random.random()*(charactersLength-1))]
+    
+    return result       #type:ignore
+
+def sendemail(subject, message, recipients, headers):
+    # django-email-server.py
+
+    connection = mail.get_connection()      # type:ignore
+            
+    connection.open()
+
+    email = mail.EmailMessage(
+        subject=subject,
+        body=message,
+        from_email=settings.EMAIL_HOST_USER,
+        to=recipients,
+        headers=headers,
+        connection=connection
+        # auth_password=settings.EMAIL_HOST_PASSWORD
+    ).send()
+    
+    # connection.send_messages(email)
+    connection.close()
+
+    return True
+

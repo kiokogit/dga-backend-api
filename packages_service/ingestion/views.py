@@ -40,7 +40,7 @@ class CreateTravelPackage(GenericViewSet):
     @action(detail=False, methods=['POST'])
     def delete_package(self, request):
         try:
-            pack = package_models.PackageModel.objects.get(package_id=request.query_params.get('id'))
+            pack = package_models.PackageModel.objects.get(id=request.query_params.get('id'))
 
         except package_models.PackageModel.DoesNotExist or TypeError:
             return Response({"details":"Package does not exist. Wrong ID passed"}, status=status.HTTP_400_BAD_REQUEST)
@@ -55,7 +55,7 @@ class CreateTravelPackage(GenericViewSet):
     @action(detail=False, methods=['POST'])
     def activate_deactivate_package(self, request):
         try:
-            pack = package_models.PackageModel.objects.get(package_id=request.query_params.get('package_id'))
+            pack = package_models.PackageModel.objects.get(id=request.query_params.get('package_id'))
 
         except package_models.PackageModel.DoesNotExist or TypeError:
             return Response({"details":"Package does not exist. Wrong ID passed"}, status=status.HTTP_400_BAD_REQUEST)
@@ -88,7 +88,7 @@ class CreateTravelPackage(GenericViewSet):
             print(e)
         images = validated_data['images']
         current_images = package_models.PackageImagesModel.objects.filter(
-            package_id=package_instance.first().package_id  # type:ignore
+            package_id=package_instance.first().id  # type:ignore
         ).all()
         for i in current_images:
             if i not in images:
@@ -97,7 +97,7 @@ class CreateTravelPackage(GenericViewSet):
         for i in images:
             if i not in current_images:
                 package_models.PackageImagesModel.objects.create(
-                    package_id=package_instance.first().package_id  # type:ignore
+                    package_id=package_instance.first().id  # type:ignore
                     **i
                 )
             

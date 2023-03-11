@@ -45,7 +45,7 @@ class PackagePublicViewSerializer(serializers.ModelSerializer):
 
         return PackageCostSerializer(
             package_models.PackageCurrencyModel.objects.filter(
-                package_id=obj.package_id
+                package_id=obj.id
             ).order_by('-amount').first(),
             many=False
         ).data
@@ -97,7 +97,7 @@ class PublicDetailViewSerializer(serializers.ModelSerializer):
 
         return PackageImagesSerializer(
             package_models.PackageImagesModel.objects.filter(
-                package_id=obj.package_id
+                package_id=obj.id
             ).all(),
             many=True
         ).data
@@ -111,7 +111,7 @@ class PublicDetailViewSerializer(serializers.ModelSerializer):
 
         return PackageCostSerializer(
             package_models.PackageCurrencyModel.objects.filter(
-                package_id=obj.package_id
+                package_id=obj.id
             ).all(),
             many=True
         ).data
