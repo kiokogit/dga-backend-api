@@ -34,6 +34,7 @@ class PackagesView(GenericViewSet, ListView):
         is_active=True
        ).order_by("-date_created")
        paged = Paginator(all_packs, 6)
+       print(all_packs)
        
        pageered = paged.page(request.query_params.get('page'))
 
@@ -61,7 +62,7 @@ class PackagesView(GenericViewSet, ListView):
     def package_detail_view(self, request):
         
         try:
-            pack = PackageModel.objects.get(package_id=request.query_params.get('package_id'))
+            pack = PackageModel.objects.get(id=request.query_params.get('package_id'))
 
         except PackageModel.DoesNotExist:
             return Response({"details": "Package not found"}, status=status.HTTP_400_BAD_REQUEST)

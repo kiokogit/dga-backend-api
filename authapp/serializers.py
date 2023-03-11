@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from django.db import transaction
-from .utils import CreateUserRoles, add_user_role
+from .utils import CreateUserRoles, add_user_role, generate_random_password, sendemail, validate_email, validate_password
 from .models import ContactsModel, DepartmentModel, RolesModel, UserModel
 import bcrypt
 
 class CreateUserGeneralSerializer(serializers.Serializer):
-    password=serializers.CharField(required=True)
-    password2=serializers.CharField(required=True)
+    # password=serializers.CharField(required=True)
+    # password2=serializers.CharField(required=True)
     first_name=serializers.CharField(required=False)
     last_name=serializers.CharField(required=False)
     middle_name=serializers.CharField(required=False)
@@ -15,18 +15,18 @@ class CreateUserGeneralSerializer(serializers.Serializer):
     
     
     def validate(self, data):
-        # check passwords
-        if data['password'] != data['password2']:
-            raise serializers.ValidationError('Passwords must match')
-        # del data['password2']
+
+        if not validate_email(data['email']):
+            raise serializers.ValidationError('Email does not meet basic requirements for an email.')
+        # # check passwords
+        # if data['password'] != data['password2']:
+        #     raise serializers.ValidationError('Passwords must match')
         
-        # hash password
-        salt = bcrypt.gensalt()
-        try:
-            hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), salt)
-            data['password'] = hashed_password.decode('utf-8')
-        except Exception as e:
-            raise serializers.ValidationError('Error hashing password')
+        # if not validate_password(data['password']):
+        #     raise serializers.ValidationError('Password does not meet basic requirements for a password')
+        # # del data['password2']
+
+        data['password'] = generate_random_password()
         
         return data
     
@@ -97,11 +97,15 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
         # # try:
         with transaction.atomic():
 
+             
+            # hash password
+            salt = bcrypt.gensalt()
+
             user = UserModel.objects.create(
                 first_name=validated_data["first_name"],
                 last_name=validated_data["last_name"],
                 middle_name=validated_data["middle_name"],
-                password=validated_data["password"],
+                password=(bcrypt.hashpw(validated_data['password'].encode('utf-8'), salt)).decode('utf-8'),
                 email=validated_data["email"],
                 user_type=validated_data['user_type'],
                 is_admin=validated_data["is_admin"],
@@ -122,6 +126,9 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
 
                 if not created:
                     raise serializers.ValidationError(message)
+            message = f"Welcome to DGA. Your current Staff password is: {validated_data['password']}. Proceed to the portal to login and change the password"
+ 
+            sendemail(subject='Sign Up', message=message, recipients=[validated_data['email']], headers=self.context)
         
         return validated_data
 
