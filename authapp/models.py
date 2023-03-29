@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from django.db import models
+from djongo import models
 from django.contrib.auth.models import AbstractBaseUser
 import uuid
 from .constants import USER_TYPES, ROLES
@@ -80,7 +80,7 @@ class OTPVerification(BaseModelWithStatus):
     
 # residential address for public
 class ResidentialAddress(BaseModelWithStatus):
-    user=models.ForeignKey(UserModel, related_name='user_location', on_delete=models.CASCADE) 
+    user=models.ForeignKey(UserModel, related_name='user_location', on_delete=models.CASCADE, null=True, blank=True) 
     country=models.CharField(max_length=50, null=True, blank=True)
     state=models.CharField(max_length=50, null=True, blank=True)
     county=models.CharField(max_length=50, null=True, blank=True)
@@ -95,7 +95,7 @@ class ResidentialAddress(BaseModelWithStatus):
 
 # user contacts
 class ContactsModel(BaseModelWithStatus):
-    user=models.ForeignKey(UserModel, related_name="contact_details", on_delete=models.CASCADE)
+    user=models.ForeignKey(UserModel, related_name="contact_details", on_delete=models.CASCADE, null=True, blank=True)
     phone_number=models.CharField(max_length=50, null=True, blank=True)
     is_phone_number_verified=models.BooleanField(default=False)
     alternative_phone_number=models.CharField(max_length=50, null=True, blank=True)
@@ -103,9 +103,9 @@ class ContactsModel(BaseModelWithStatus):
 
 class ProfessionalAccountsModel(BaseModelWithStatus):
     account_name = models.CharField(max_length=50, unique=True)
-    account_roles = models.ForeignKey(RolesModel, related_name='roles', on_delete=models.CASCADE)
+    account_roles = models.ForeignKey(RolesModel, related_name='roles', on_delete=models.CASCADE, null=True, blank=True)
 
 class ProfessionalUpgradesModel(BaseModelWithStatus):
-    user = models.ForeignKey(UserModel, related_name="professional_upgrade", on_delete=models.CASCADE)
-    professional_account = models.ForeignKey(ProfessionalAccountsModel, related_name='professional_accounts', on_delete=models.CASCADE)
+    user = models.ForeignKey(UserModel, related_name="professional_upgrade", on_delete=models.CASCADE, null=True, blank=True)
+    professional_account = models.ForeignKey(ProfessionalAccountsModel, related_name='professional_accounts', on_delete=models.CASCADE, null=True, blank=True)
     upgraded_by = models.CharField(max_length=50, null=True, blank=True)
