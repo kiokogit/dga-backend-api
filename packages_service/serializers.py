@@ -46,9 +46,10 @@ class PackagePublicViewSerializer(serializers.ModelSerializer):
         return PackageCostSerializer(
             package_models.PackageCurrencyModel.objects.filter(
                 package_id=obj.id
-            ).order_by('-amount').first(),
+            ).first(),
             many=False
         ).data
+
 
 class TagsSerializer(serializers.ModelSerializer):
 

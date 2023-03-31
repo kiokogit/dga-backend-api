@@ -135,8 +135,7 @@ def validate_email(email:str):
 
 def validate_password(passw:str):
 
-    if not (len(passw) < 8
-    ):
+    if len(passw) < 8:
         return False
     
     return True

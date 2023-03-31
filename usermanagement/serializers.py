@@ -13,9 +13,9 @@ class PublicUserBasicDetails(serializers.ModelSerializer):
             ]
 
 class PublicUserDetailsSerializer(PublicUserBasicDetails):
-    contact_details = serializers.SerializerMethodField(read_only=True)
-    residential_address = serializers.SerializerMethodField(read_only=True)
-    roles = serializers.SerializerMethodField(read_only=True)
+    # contact_details = serializers.SerializerMethodField(read_only=True)
+    # residential_address = serializers.SerializerMethodField(read_only=True)
+    # roles = serializers.SerializerMethodField(read_only=True)
     
     class Meta(PublicUserBasicDetails.Meta):
         fields= PublicUserBasicDetails.Meta.fields + [
@@ -26,32 +26,32 @@ class PublicUserDetailsSerializer(PublicUserBasicDetails):
             "is_deleted",
             "is_email_verified",
             "is_sms_verified",
-            "contact_details",
-            "residential_address",
-            "roles",
+            # "contact_details",
+            # "residential_address",
+            # "roles",
             "department_id",
             "profile_pic"
         ]
     
-    def get_contact_details(self, obj):
-        details = models.ContactsModel.objects.filter(
-            user__email=obj.email
-        )
-        if details.exists():
-            return details[0].phone_number
-        else:
-            return "None"
+    # def get_contact_details(self, obj):
+    #     details = models.ContactsModel.objects.filter(
+    #         user__email=obj.email
+    #     )
+    #     if details.exists():
+    #         return details[0].phone_number
+    #     else:
+    #         return "None"
         
-    def get_residential_address(self, obj):
+    # def get_residential_address(self, obj):
         
-        return "No Entry"
+    #     return "No Entry"
 
-    def get_roles(self, obj):
-        roles = obj.roles.filter(is_active=True)
-        return UserRolesSerializer(
-            roles,
-            many=True
-        ).data
+    # def get_roles(self, obj):
+    #     roles = obj.roles.filter(is_active=True)
+    #     return UserRolesSerializer(
+    #         roles,
+    #         many=True
+    #     ).data
 
 
 class UserRolesSerializer(serializers.ModelSerializer):

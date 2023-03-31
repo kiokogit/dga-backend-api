@@ -52,6 +52,7 @@ class PublicAccountsViewSet(GeneralView):
     def get_user_own_profile(self, request):
         """Get user complete details based on signed token"""
         user = self.get_logged_in_user(request)
+        print(user)
         
         if user is None:
             return Response({"details": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
