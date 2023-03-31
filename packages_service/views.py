@@ -62,12 +62,12 @@ class PublicPackagesView(ListModelMixin, GeneralView):
                 is_active__in=[True],
                 tags__tag=filter_
                 ) 
-        if other_filters not in [[], {}]:
+        if other_filters==True:
              return PackageModel.objects.filter(
                 # is_active__in=[True],
-                Q(tags__tag__in=other_filters.tags, is_active__in=[True]) |
-                Q(no_of_days__in=other_filters.duration, is_active__in=[True]) |
-                Q(city_town__in=other_filters.location, is_active__in=[True])
+                Q(tags__tag__in=[self.request.query_params.get('tags')], is_active__in=[True]) &
+                Q(no_of_days__in=[self.request.query_params.get('duration')], is_active__in=[True]) |
+                Q(city_town__in=[self.request.query_params.get('location')], is_active__in=[True])
                 ).distinct()
         return super().get_queryset()
 
@@ -86,36 +86,6 @@ class PublicPackagesView(ListModelMixin, GeneralView):
             many=False
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['GET'])
-    def package_by_tags(self, request):
-
-        filters = request.query_params.get("filter").split(',')
-        if filters[0]!="":
-            all_packs = PackageModel.objects.filter(
-                tags__tag__in=filters,
-                is_active=True
-            ).order_by("-date_created")
-        else:
-            all_packs = PackageModel.objects.filter(
-                is_active=True
-                ).order_by("-date_created")
-    
-        paged = Paginator(all_packs, 6)
-       
-        pageered = paged.page(request.query_params.get('page'))
-
-        serializer = PackagePublicViewSerializer(
-            pageered,
-            many=True
-        )
-
-        query_set = {
-            "data":serializer.data, 
-            "count":all_packs.count(),
-            "tags":filters
-            }
-        return Response(query_set, status=status.HTTP_200_OK)
     
 
 class StaffPackagesView(ModelViewSet):

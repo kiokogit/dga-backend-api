@@ -10,14 +10,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASES = {
         'default': {
             'ENGINE': 'djongo',
-            'NAME': 'dga-staging',
+            'NAME': os.environ.get('DBNAME'),
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
-                'host': 'mongodb+srv://dgatours:dgatours@cluster0.qqjftb5.mongodb.net/?retryWrites=true&w=majority',
-                'port': 27017,
-                'username': 'dgatours',
-                'password': 'dgatours',
-                'authSource': 'dga-staging',
+                'host': os.environ.get('DBHOST'),
+                'port': os.environ.get('DBPORT'),
+                'username': os.environ.get('DBUSER'),
+                'password': os.environ.get('DBPASS'),
+                'authSource': os.environ.get('DBNAME'),
                 'authMechanism': 'SCRAM-SHA-1'
             },
             # 'LOGGING': {
