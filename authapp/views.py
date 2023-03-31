@@ -44,9 +44,9 @@ class GeneralView(GenericViewSet):
     
     @staticmethod
     def get_user_by_email(email, user_type):
-        user = UserModel.objects.filter(email=email, user_type=user_type)
-        if user.exists():
-            return True, user.first()
+        user = UserModel.objects.filter(email=email, user_type=user_type).first()
+        if user:
+            return True, user
         else:
             return False, None
 
@@ -54,9 +54,9 @@ class SignUpUser(GenericViewSet):
     permission_classes = (AllowAny,)
     @staticmethod
     def get_user_by_email(email, user_type):
-        user = UserModel.objects.filter(email=email, user_type=user_type)
-        if user.exists():
-            return True, user.first()
+        user = UserModel.objects.filter(email=email, user_type=user_type).first()
+        if user:
+            return True, user
         else:
             return False, None
 
@@ -136,10 +136,16 @@ class LoginUser(ViewSet):
             return Response({"details": format_error(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
         
         # get user
-        user_exists, user = GeneralView.get_user_by_email(request.data.get('email'), request.data.get('user_type'))
-        if not user_exists or user is None:
+        user_exists = False
+        user = None
+        try:
+            user_exists, user = GeneralView.get_user_by_email(request.data.get('email'), request.data.get('user_type'))
+        except Exception as e:
+            print('There was a exception')
+            print(e)
+        if not user_exists:
             return Response({"details": "Invalid Email/Password"}, status=status.HTTP_400_BAD_REQUEST)
-        
+       
         # check is password match
         encoded = request.data.get('password').encode('utf-8')
         compare = bcrypt.checkpw(encoded, user.password.encode('utf-8'))

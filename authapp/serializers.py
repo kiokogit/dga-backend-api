@@ -5,8 +5,8 @@ from .models import ContactsModel, DepartmentModel, RolesModel, UserModel
 import bcrypt
 
 class CreateUserGeneralSerializer(serializers.Serializer):
-    # password=serializers.CharField(required=True)
-    # password2=serializers.CharField(required=True)
+    password=serializers.CharField(required=True)
+    password2=serializers.CharField(required=True)
     first_name=serializers.CharField(required=False)
     last_name=serializers.CharField(required=False)
     middle_name=serializers.CharField(required=False)
@@ -18,15 +18,15 @@ class CreateUserGeneralSerializer(serializers.Serializer):
 
         if not validate_email(data['email']):
             raise serializers.ValidationError('Email does not meet basic requirements for an email.')
-        # # check passwords
-        # if data['password'] != data['password2']:
-        #     raise serializers.ValidationError('Passwords must match')
+        # check passwords
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError('Passwords must match')
         
-        # if not validate_password(data['password']):
-        #     raise serializers.ValidationError('Password does not meet basic requirements for a password')
-        # # del data['password2']
+        if not validate_password(data['password']):
+            raise serializers.ValidationError('Password does not meet basic requirements for a password')
+        # del data['password2']
 
-        data['password'] = generate_random_password()
+        # data['password'] = generate_random_password()
         
         return data
     
@@ -128,7 +128,7 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
                     raise serializers.ValidationError(message)
             message = f"Welcome to DGA. Your current Staff password is: {validated_data['password']}. Proceed to the portal to login and change the password"
  
-            sendemail(subject='Sign Up', message=message, recipients=[validated_data['email']], headers=self.context)
+            # sendemail(subject='Sign Up', message=message, recipients=[validated_data['email']], headers=self.context)
         
         return validated_data
 
