@@ -156,6 +156,10 @@ class LoginUser(ViewSet):
         token = Token.objects.filter(user=user).first()
         if not token:
             token = Token.objects.create(user=user)
+        else:
+            user.is_email_verified = True
+            user.is_active = True
+            user.save()
 
         payload = {
             "user_id": str(user.id),

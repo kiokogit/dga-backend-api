@@ -1,14 +1,8 @@
 import datetime
 import random
-from django.core.mail import send_mail
-import django
 from django.conf import settings
 from .models import DepartmentModel, RolesModel, UserModel
-import os
-
-from django.core import mail
-            
-
+import boto3            
 
 def get_user_roles(user):
     user_roles = user.roles.filter(
@@ -155,22 +149,35 @@ def generate_random_password():
 def sendemail(subject, message, recipients, headers):
     # django-email-server.py
 
-    connection = mail.get_connection()      # type:ignore
-            
-    connection.open()
-
-    email = mail.EmailMessage(
-        subject=subject,
-        body=message,
-        from_email=settings.EMAIL_HOST_USER,
-        to=recipients,
-        headers=headers,
-        connection=connection
-        # auth_password=settings.EMAIL_HOST_PASSWORD
-    ).send()
+     # send email for password
     
-    # connection.send_messages(email)
-    connection.close()
 
     return True
 
+
+def send_staff_account_signup(to_email, password):
+    client = boto3.client("ses", region_name="eu-north-1", aws_access_key_id=settings.AWS_ACCESS_ID,
+         aws_secret_access_key= settings.AWS_ACCESS_KEY)
+
+    client.send_email(
+    Destination={
+        'ToAddresses': [
+            to_email,
+        ],
+    },
+    Message={
+        'Body': {
+            'Html': {
+                'Charset': 'UTF-8',
+                'Data': f'<h3>An access to DGA Staff Portal has been created for you.</h3> <p>Welcome to DGA Staff Portal.</p><h4>Username: {to_email}</h4><h4>Password: {password}</h4> <div>Consider Changing it after login to your preference</div> <div>Feel free to contact DGA Technical team for any support <a href="http://dga-tours.com/public/contact_us" target="_blank">through Here</a>.</div>',
+            },
+        },
+        'Subject': {
+            'Charset': 'UTF-8',
+            'Data': 'Welcome to DGA Staff Team',
+        },
+    },
+    Source='dgatours.travel@gmail.com',
+    )
+
+    return True
