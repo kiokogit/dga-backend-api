@@ -161,13 +161,3 @@ LOGGING = {
 
 AUTH_USER_MODEL = 'authapp.UserModel'
 
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'dgatours.travel@gmail.com'
-EMAIL_HOST_PASSWORD = 'dgatours'
-EMAIL_PORT = 465
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-DEFAULT_FROM_EMAIL = 'dgatours.travel@gmail.com'
-
