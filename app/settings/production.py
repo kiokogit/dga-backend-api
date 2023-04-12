@@ -13,7 +13,7 @@ DATABASES = {
             'NAME': 'dga-staging',
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
-                'host': 'mongodb+srv://dgatours:dgatours@cluster0.qqjftb5.mongodb.net/?retryWrites=true&w=majority',
+                'host':'mongodb+srv://dgatours:dgatours@dga-production.9lwhch8.mongodb.net/?retryWrites=true&w=majority',
                 'port': 27017,
                 'username': 'dgatours',
                 'password': 'dgatours',
