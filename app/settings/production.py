@@ -39,7 +39,7 @@ DATABASES = {
             'ENFORCE_SCHEMA': False,
             'CLIENT': {
                 'host': os.environ.get('DBHOST'),
-                'port': os.environ.get('DBPORT'),
+                'port': 27017,
                 'username': os.environ.get('DBUSER'),
                 'password': os.environ.get('DBPASS'),
                 'authSource': os.environ.get('DBNAME'),
