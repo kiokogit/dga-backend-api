@@ -161,16 +161,3 @@ LOGGING = {
 
 AUTH_USER_MODEL = 'authapp.UserModel'
 
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'kiokovincent12@gmail.com'
-EMAIL_HOST_PASSWORD = 'kioko@1234'
-DEFAULT_FROM_EMAIL = 'kiokovincent12@gmail.com'
-EMAIL_ALLOWED_HOSTS = ['127.0.0.1:5001']
-
-
-AWS_ACCESS_ID = "AKIA2MM6NLJH7EVPH3ER"
-AWS_ACCESS_KEY = "i3Nsp2l4BxbxI+VncWQahguhoWuvnPiZF15mJrtJ"

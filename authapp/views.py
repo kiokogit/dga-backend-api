@@ -2,6 +2,8 @@ from shared_utils.utils import format_error
 from .models import UserModel
 from . import serializers
 from app import settings
+from dotenv import load_dotenv
+import os
 
 import logging
 

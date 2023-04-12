@@ -4,6 +4,9 @@ from django.conf import settings
 from .models import DepartmentModel, RolesModel, UserModel
 import boto3            
 
+from dotenv import load_dotenv
+import os
+
 def get_user_roles(user):
     user_roles = user.roles.filter(
         is_active=True,
@@ -156,8 +159,8 @@ def sendemail(subject, message, recipients, headers):
 
 
 def send_staff_account_signup(to_email, password):
-    client = boto3.client("ses", region_name="eu-north-1", aws_access_key_id=settings.AWS_ACCESS_ID,
-         aws_secret_access_key= settings.AWS_ACCESS_KEY)
+    client = boto3.client("ses", region_name="eu-north-1", aws_access_key_id=os.environ.get('AWS_ACCESS_ID'),
+         aws_secret_access_key=os.environ.get('AWS_ACCESS_KEY'))
 
     client.send_email(
     Destination={
