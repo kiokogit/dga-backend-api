@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 
+load_dotenv()
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-g$1n#9%#q1(_a_!m_#e&j=js)zf-=e5a8m+(fa#l=z*9ro*-s4'
 
