@@ -80,7 +80,12 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
             ).actor_has_permission()
             if not has_perm:
                 raise serializers.ValidationError(f"You do not have permission to add a user with the role of a {role_instance.role}.")
-
+        
+        try:
+            send_staff_account_signup(to_email=data['email'], password=data['password'])
+        except:
+            raise serializers.ValidationError('Sorry, there was an error processing request')
+            
         return super().validate(data)
 
     def create(self, validated_data):
@@ -119,8 +124,7 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
                 ).add_user_role()
 
                 if not created:
-                    raise serializers.ValidationError(message)
-        send_staff_account_signup(to_email=validated_data['email'], password=validated_data['password'])
+                    pass
         return validated_data
 
 class CreateSystemAccountsSerializer(CreateUserGeneralSerializer):
