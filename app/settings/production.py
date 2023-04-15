@@ -34,53 +34,53 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #         }
 #     }
 
-DATABASES = {
-        'default': {
-            'ENGINE': 'djongo',
-            'NAME': os.environ.get('DBNAME'),
-            'ENFORCE_SCHEMA': False,
-            'CLIENT': {
-                'host': os.environ.get('DBHOST'),
-                'port': 27017,
-                'username': os.environ.get('DBUSER'),
-                'password': os.environ.get('DBPASS'),
-                'authSource': os.environ.get('DBNAME'),
-                'authMechanism': 'SCRAM-SHA-1'
-            },
-            # 'LOGGING': {
-            #     'version': 1,
-            #     'loggers': {
-            #         'djongo': {
-            #             # 'level': 'INFO',
-            #             # 'propagate': False,                        
-            #         }
-            #     },
-            #  },
-        }
-    }
-
-
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DBNAME'),
-#         'USER': os.environ.get('DBUSER'),
-#         'PASSWORD': os.environ.get('DBPASS'),
-#         'CONN_MAX_AGE': 1000,
-#         'OPTIONS': {
-#             'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
-#         },
-#         'HOST': str(os.environ.get('DBHOST')),
-#         'PORT': int(os.environ.get('DBPORT')), #type: ignore
-#         'TEST': {
-#             'ENGINE': 'django.db.backends.postgresql',
+#         'default': {
+#             'ENGINE': 'djongo',
 #             'NAME': os.environ.get('DBNAME'),
-#             'USER': os.environ.get('DBUSER'),
-#             'PASSWORD': os.environ.get('DBPASS'),
-#             'OPTIONS': {
-#                 'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
+#             'ENFORCE_SCHEMA': False,
+#             'CLIENT': {
+#                 'host': os.environ.get('DBHOST'),
+#                 'port': 27017,
+#                 'username': os.environ.get('DBUSER'),
+#                 'password': os.environ.get('DBPASS'),
+#                 'authSource': os.environ.get('DBNAME'),
+#                 'authMechanism': 'SCRAM-SHA-1'
 #             },
-
-#         },
+#             # 'LOGGING': {
+#             #     'version': 1,
+#             #     'loggers': {
+#             #         'djongo': {
+#             #             # 'level': 'INFO',
+#             #             # 'propagate': False,                        
+#             #         }
+#             #     },
+#             #  },
+#         }
 #     }
-# }
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DBNAME'),
+        'USER': os.environ.get('DBUSER'),
+        'PASSWORD': os.environ.get('DBPASS'),
+        'CONN_MAX_AGE': 1000,
+        'OPTIONS': {
+            'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
+        },
+        'HOST': 'db',
+        'PORT': int(os.environ.get('DBPORT')), #type: ignore
+        'TEST': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DBNAME'),
+            'USER': os.environ.get('DBUSER'),
+            'PASSWORD': os.environ.get('DBPASS'),
+            'OPTIONS': {
+                'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
+            },
+
+        },
+    }
+}
