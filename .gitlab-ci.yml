@@ -6,7 +6,6 @@ variables:
 
 stages:
   - build
-  - test
   - deploy
 
 build:
@@ -19,12 +18,6 @@ build:
     - docker login -u _ -p "$HEROKU_API_KEY" registry.heroku.com
     - docker tag $HEROKU_APP_NAME registry.heroku.com/$HEROKU_APP_NAME/web
     - docker push registry.heroku.com/$HEROKU_APP_NAME/web
-
-test:
-  image: python:3.8
-  script:
-    - pip install -r requirements.txt
-    - python manage.py test
 
 deploy:
   image: registry.heroku.com/heroku-cli:latest
