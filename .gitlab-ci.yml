@@ -9,7 +9,7 @@ stages:
   - build
   - deploy
   - migrate
-  
+
 before_script:
   - python -m venv venv
   - source venv/bin/activate
@@ -19,7 +19,6 @@ before_script:
 build:
   stage: build
   script:
-    - python manage.py collectstatic --noinput
     - docker build -t my-image .
 
 deploy:
