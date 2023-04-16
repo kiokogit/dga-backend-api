@@ -19,12 +19,16 @@ deploy:
   script:
     - docker-compose -f docker-compose.yml up -d
   only:
-    - staging, Testing, main
+    - staging
+    - Testing
+    - main
 
 migrate:
   stage: migrate
   script:
     - docker-compose -f docker-compose.yml run web python manage.py migrate
   only:
-    - staging, Testing, main
+    - staging
+    - Testing
+    - main
 
