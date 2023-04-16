@@ -149,6 +149,9 @@ def generate_random_password():
     
     return result       #type:ignore
 
+def generate_simple_pass(username):
+    return username + '@2023'
+
 def sendemail(subject, message, recipients, headers):
     # django-email-server.py
 
@@ -161,7 +164,6 @@ def sendemail(subject, message, recipients, headers):
 def send_staff_account_signup(to_email, password):
     client = boto3.client("ses", region_name="eu-north-1", aws_access_key_id=os.environ.get('AWS_ACCESS_ID'),
          aws_secret_access_key=os.environ.get('AWS_ACCESS_KEY'))
-
     client.send_email(
     Destination={
         'ToAddresses': [

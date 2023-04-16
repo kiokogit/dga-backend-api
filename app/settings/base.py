@@ -138,16 +138,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-SERVICE_URLS={
-    'GENERAL_INFO_SERVICE':5000,
-    'ACL_SERVICE':5001,
-    'PACKAGES_SERVICE':5002,
-    'BOOKING_SERVICE':5003,
-    'SHARED_SERVICE':5004,
-}
+# SERVICE_URLS={
+#     'GENERAL_INFO_SERVICE':5000,
+#     'ACL_SERVICE':5001,
+#     'PACKAGES_SERVICE':5002,
+#     'BOOKING_SERVICE':5003,
+#     'SHARED_SERVICE':5004,
+# }
 
-runserver.default_port = SERVICE_URLS['ACL_SERVICE']       # <-- Your port
-runserver.default_addr = '127.0.0.1'   # <-- Your address
+# runserver.default_port = SERVICE_URLS['ACL_SERVICE']       # <-- Your port
+# runserver.default_addr = '127.0.0.1'   # <-- Your address
 
 
 LOGGING = {

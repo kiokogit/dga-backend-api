@@ -1,13 +1,14 @@
+import os
 from django.conf import settings
 from rest_framework import serializers
 from django.db import transaction
-from .utils import CreateUserRoles, add_user_role, generate_random_password, send_staff_account_signup, sendemail, validate_email, validate_password
+from .utils import CreateUserRoles, add_user_role, generate_random_password, generate_simple_pass, send_staff_account_signup, sendemail, validate_email, validate_password
 from .models import ContactsModel, DepartmentModel, RolesModel, UserModel
 import bcrypt
 
 
 class CreateUserGeneralSerializer(serializers.Serializer):
-    password=serializers.CharField(required=False)
+    # password=serializers.CharField(required=False)
     # password2=serializers.CharField(required=True)
     first_name=serializers.CharField(required=False)
     last_name=serializers.CharField(required=False)
@@ -17,8 +18,6 @@ class CreateUserGeneralSerializer(serializers.Serializer):
     
     
     def validate(self, data):
-
-        data['password'] = generate_random_password()
 
         if not validate_email(data['email']):
             raise serializers.ValidationError('Email does not meet basic requirements for an email.')
@@ -66,6 +65,7 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
     def __init__(self, instance=None, data=..., **kwargs):
         super().__init__(instance, data, **kwargs)
         self.error_messages = []
+        self.password = None
 
     
     def validate(self, data):
@@ -80,11 +80,13 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
             ).actor_has_permission()
             if not has_perm:
                 raise serializers.ValidationError(f"You do not have permission to add a user with the role of a {role_instance.role}.")
-        
+        self.password = generate_simple_pass(data['first_name'].lower())
+        print('pass: ', self.password)
         try:
-            send_staff_account_signup(to_email=data['email'], password=data['password'])
-        except:
-            raise serializers.ValidationError('Sorry, there was an error processing request')
+            send_staff_account_signup(to_email=data['email'], password=self.password)
+        except Exception as e:
+            print(e)
+            # raise serializers.ValidationError('Sorry, there was an error sending password to the specified email request')
             
         return super().validate(data)
 
@@ -104,7 +106,7 @@ class CreateInternalStaffUserSerializer(CreateUserGeneralSerializer, StaffCreate
                 first_name=validated_data["first_name"],
                 last_name=validated_data["last_name"],
                 middle_name=validated_data["middle_name"],
-                password=(bcrypt.hashpw(validated_data['password'].encode('utf-8'), salt)).decode('utf-8'),
+                password=(bcrypt.hashpw(self.password.encode('utf-8'), salt)).decode('utf-8'),
                 email=validated_data["email"],
                 user_type=validated_data['user_type'],
                 is_admin=validated_data["is_admin"],

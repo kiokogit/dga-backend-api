@@ -7,7 +7,16 @@ load_dotenv()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-g$1n#9%#q1(_a_!m_#e&j=js)zf-=e5a8m+(fa#l=z*9ro*-s4'
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+DATABASES = {
+    'default':{
+        'ENGINE':'django.db.backends.sqlite3',
+         'NAME': BASE_DIR / 'db_prod.sqlite3'
+        
+    }
+}
+
 
 # DATABASES = {
 #         'default': {
@@ -34,30 +43,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #         }
 #     }
 
-DATABASES = {
-        'default': {
-            'ENGINE': 'djongo',
-            'NAME': os.environ.get('DBNAME'),
-            'ENFORCE_SCHEMA': False,
-            'CLIENT': {
-                'host': os.environ.get('DBHOST'),
-                'port': 27017,
-                'username': os.environ.get('DBUSER'),
-                'password': os.environ.get('DBPASS'),
-                'authSource': os.environ.get('DBNAME'),
-                'authMechanism': 'SCRAM-SHA-1'
-            },
-            # 'LOGGING': {
-            #     'version': 1,
-            #     'loggers': {
-            #         'djongo': {
-            #             # 'level': 'INFO',
-            #             # 'propagate': False,                        
-            #         }
-            #     },
-            #  },
-        }
-    }
+# DATABASES = {
+#         'default': {
+#             'ENGINE': 'djongo',
+#             'NAME': os.environ.get('DBNAME'),
+#             'ENFORCE_SCHEMA': False,
+#             'CLIENT': {
+#                 'host': os.environ.get('DBHOST'),
+#                 'port': 27017,
+#                 'username': os.environ.get('DBUSER'),
+#                 'password': os.environ.get('DBPASS'),
+#                 'authSource': os.environ.get('DBNAME'),
+#                 'authMechanism': 'SCRAM-SHA-1'
+#             },
+#             # 'LOGGING': {
+#             #     'version': 1,
+#             #     'loggers': {
+#             #         'djongo': {
+#             #             # 'level': 'INFO',
+#             #             # 'propagate': False,                        
+#             #         }
+#             #     },
+#             #  },
+#         }
+#     }
 
 
 # DATABASES = {
@@ -70,7 +79,7 @@ DATABASES = {
 #         'OPTIONS': {
 #             'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
 #         },
-#         'HOST': str(os.environ.get('DBHOST')),
+#         'HOST': 'db',
 #         'PORT': int(os.environ.get('DBPORT')), #type: ignore
 #         'TEST': {
 #             'ENGINE': 'django.db.backends.postgresql',

@@ -1,35 +1,21 @@
-version: "1"
-services: 
-  web-server: 
-    build: https://gitlab.com/dasgrosse/backendapi/usermanagement.git#staging
-    ports: 
-      - "4210::5000"
-    entrypoint: "python manage.py runserver"
+version: '3'
 
-  web-client-public:
-    build: https://gitlab.com/dasgrosse/frontendapi/publicside.git#staging
-    ports: 
-      - web-server: 5000
-    # just keep server alive
-    entrypoint: "npm run start"
-
-  web-client-staff:
-    build: https://gitlab.com/dasgrosse/frontendapi/staffside.git#staging
-    ports: 
-      - web-server: 5000
-    # just keep server alive
-    entrypoint: "npm run start"
-
-  database: 
-    image: "postgres:alpine"
-    environment: 
-      POSTGRES_USER: postgres
-      POSTGRES_DB: dga
-      POSTGRES_PASS: postgres
-    ports: 
-      - "4201:5432"
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - server_db:/var/lib/postgresql/data
+      - .:/code
+    ports:
+      - "8000:8000"
+    # depends_on:
+      # - db
+  # db:
+  #   image: postgres
+  #   environment:
+  #     DBNAME: dga_production
+  #     DBUSER: dgatours
+  #     DBPASS: dgatours
+  #     DBSCHEMA: public
+  #     DBPORT: 5432
 
-volumes: 
-  server_db:
