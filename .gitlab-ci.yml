@@ -32,16 +32,9 @@ deploy:
     - echo "$HEROKU_API_KEY" | docker login -u _ --password-stdin registry.heroku.com
     - heroku container:push web --app $HEROKU_APP_NAME
     - heroku container:release web --app $HEROKU_APP_NAME
-  only:
-    - master
-    - staging
-
-deploy-production:
-  image: registry.heroku.com/heroku-cli:latest
-  script:
-    - echo "$HEROKU_API_KEY" | docker login -u _ --password-stdin registry.heroku.com
-    - heroku container:push web --app $HEROKU_APP_NAME
-    - heroku container:release web --app $HEROKU_APP_NAME
     - heroku run python manage.py migrate --app $HEROKU_APP_NAME
   only:
+    - main
+    - staging
+    - Testing
     - production
