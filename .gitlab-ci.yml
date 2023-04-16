@@ -5,43 +5,30 @@ variables:
   HEROKU_API_KEY: 1d8c2daa-b379-43c0-ae70-1fd1a1e137fd
 
 stages:
-  - build
   - test
   - deploy
 
-build:
-  image: docker:latest
-  stage: build
-  services:
-    - docker:dind
-  script:
-    - docker build --pull -t $HEROKU_APP_NAME -f Dockerfile .
-    - docker login -u _ -p "$HEROKU_API_KEY" registry.heroku.com
-    - docker tag $HEROKU_APP_NAME registry.heroku.com/$HEROKU_APP_NAME/web
-    - docker push registry.heroku.com/$HEROKU_APP_NAME/web
-
+# Define the test stage
 test:
+  # Use the official Python Docker image
   image: python:3.8
+  # Set up the environment
+  environment:
+    name: test
+  # Define the script to run
   script:
     - pip install -r requirements.txt
     - python manage.py test
 
+# Define the deploy stage
 deploy:
+  # Use the official Heroku CLI Docker image
   image: registry.heroku.com/heroku-cli:latest
+  # Set up the environment
+  environment:
+    name: production
+  # Define the script to run
   script:
     - echo "$HEROKU_API_KEY" | docker login -u _ --password-stdin registry.heroku.com
     - heroku container:push web --app $HEROKU_APP_NAME
     - heroku container:release web --app $HEROKU_APP_NAME
-  only:
-    - master
-    - staging
-
-deploy-production:
-  image: registry.heroku.com/heroku-cli:latest
-  script:
-    - echo "$HEROKU_API_KEY" | docker login -u _ --password-stdin registry.heroku.com
-    - heroku container:push web --app $HEROKU_APP_NAME
-    - heroku container:release web --app $HEROKU_APP_NAME
-    - heroku run python manage.py migrate --app $HEROKU_APP_NAME
-  only:
-    - production
