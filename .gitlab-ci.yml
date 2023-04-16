@@ -10,16 +10,12 @@ stages:
 
 test:
   image: python:3.8
-  environment:
-    name: test
   script:
     - pip install -r requirements.txt
     - python manage.py test
 
 deploy:
   image: registry.heroku.com/heroku-cli:latest
-  environment:
-    name: production
   script:
     - echo "$HEROKU_API_KEY" | docker login -u _ --password-stdin registry.heroku.com
     - heroku container:push web --app $HEROKU_APP_NAME
@@ -30,8 +26,6 @@ deploy:
 
 deploy-production:
   image: registry.heroku.com/heroku-cli:latest
-  environment:
-    name: production
   script:
     - echo "$HEROKU_API_KEY" | docker login -u _ --password-stdin registry.heroku.com
     - heroku container:push web --app $HEROKU_APP_NAME
