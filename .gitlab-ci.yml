@@ -1,8 +1,8 @@
 image: python:3.8
 
 variables:
-  HEROKU_APP_NAME: dga-prod-api
-  HEROKU_API_KEY: 1d8c2daa-b379-43c0-ae70-1fd1a1e137fd
+  HEROKU_APP_NAME: "dga-prod-api"
+  HEROKU_API_KEY: "1d8c2daa-b379-43c0-ae70-1fd1a1e137fd"
 
 stages:
   - build
