@@ -8,6 +8,7 @@ variables:
 stages:
   - build
   - deploy
+  - migrate
 
 build:
   image: docker:latest
@@ -16,7 +17,7 @@ build:
     - docker:dind
   script:
     - docker build --pull -t $HEROKU_APP_NAME -f Dockerfile .
-    - docker login --username=_ registry.heroku.com --password-PASS
+    - docker login --username=_ registry.heroku.com --password PASS
     - docker tag $HEROKU_APP_NAME registry.heroku.com/$HEROKU_APP_NAME/web
     - docker push registry.heroku.com/$HEROKU_APP_NAME/web
 
@@ -27,6 +28,16 @@ deploy:
     - heroku auth:token | docker login --username=_ registry.heroku.com --password-stdin
     - heroku container:push web --app $HEROKU_APP_NAME
     - heroku container:release web --app $HEROKU_APP_NAME
+    - heroku run python manage.py migrate --app $HEROKU_APP_NAME
+  only:
+    - main
+    - staging
+    - Testing
+
+migrate:
+  stage: migrate
+  script:
+    - echo "Running migrations on Heroku..."
     - heroku run python manage.py migrate --app $HEROKU_APP_NAME
   only:
     - main
