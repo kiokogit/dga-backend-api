@@ -1,26 +1,26 @@
-# image: docker:latest
+image: docker:latest
 
-# services:
-#   - docker:dind
+services:
+  - docker:dind
 
-# stages:
-#   - build
-#   - deploy
-#   - migrate
+stages:
+  - build
+  - deploy
+  - migrate
 
-# build:
-#   stage: build
-#   script:
-#     - docker build -t myproject .
-#     - docker-compose -f docker-compose.yml build
+build:
+  stage: build
+  script:
+    - docker build -t myproject .
+    - docker-compose -f docker-compose.yml build
 
-# deploy:
-#   stage: deploy
-#   script:
-#     - docker-compose -f docker-compose.yml up -d
+deploy:
+  stage: deploy
+  script:
+    - docker-compose -f docker-compose.yml up -d
 
-# migrate:
-#   stage: migrate
-#   script:
-#     - docker-compose -f docker-compose.yml run web python manage.py migrate
+migrate:
+  stage: migrate
+  script:
+    - docker-compose -f docker-compose.yml run web python manage.py migrate
 
