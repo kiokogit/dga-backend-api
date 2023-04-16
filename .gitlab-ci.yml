@@ -21,6 +21,7 @@ build:
 
 deploy:
   image: registry.heroku.com/heroku-cli:latest
+  stage: deploy
   script:
     - echo "$HEROKU_API_KEY" | docker login -u _ --password-stdin registry.heroku.com
     - heroku container:push web --app $HEROKU_APP_NAME
@@ -30,4 +31,3 @@ deploy:
     - main
     - staging
     - Testing
-    - production
