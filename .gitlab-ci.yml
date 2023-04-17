@@ -1,7 +1,8 @@
-image: docker:latest
+image: python:3.8
 
-services:
-  - docker:dind
+variables:
+  HEROKU_APP_NAME: "dga-prod-api"
+  HEROKU_API_KEY: "1d8c2daa-b379-43c0-ae70-1fd1a1e137fd"
 
 stages:
   - build
@@ -9,26 +10,38 @@ stages:
   - migrate
 
 build:
+  image: docker:latest
   stage: build
+  services:
+    - docker:dind
   script:
-    - docker build -t myproject .
-    - docker-compose -f docker-compose.yml build
+    - docker build --pull -t $HEROKU_APP_NAME -f Dockerfile .
+    - docker login -u _ -p "$HEROKU_API_KEY" registry.heroku.com
+    - docker tag $HEROKU_APP_NAME registry.heroku.com/$HEROKU_APP_NAME/web
+    - docker push registry.heroku.com/$HEROKU_APP_NAME/web
 
 deploy:
+  image: registry.heroku.com/heroku-cli:latest
   stage: deploy
   script:
-    - docker-compose -f docker-compose.yml up -d
+    - echo $HEROKU_API_KEY | docker login -u _ --password-stdin registry.heroku.com
+    - echo "Pushing container to Heroku registry..."
+    - heroku container:push web --app $HEROKU_APP_NAME
+    - heroku container:release web --app $HEROKU_APP_NAME
+    - heroku run python manage.py migrate --app $HEROKU_APP_NAME
   only:
+    - main
     - staging
     - Testing
-    - main
+
 
 migrate:
   stage: migrate
   script:
-    - docker-compose -f docker-compose.yml run web python manage.py migrate
+    - echo "Running migrations on Heroku..."
+    - heroku run python manage.py migrate --app $HEROKU_APP_NAME
+  when: manual
   only:
+    - main
     - staging
     - Testing
-    - main
-
