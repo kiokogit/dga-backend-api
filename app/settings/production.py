@@ -33,10 +33,10 @@ DATABASES = {
         'OPTIONS': {
             'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
         },
-        'HOST': 'db',
+        'HOST': os.environ.get('DBHOST'),
         'PORT': int(os.environ.get('DBPORT')), #type: ignore
         'TEST': {
-            'ENGINE': 'django.db.backends.postgresql',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': os.environ.get('DBNAME'),
             'USER': os.environ.get('DBUSER'),
             'PASSWORD': os.environ.get('DBPASS'),
