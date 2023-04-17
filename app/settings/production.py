@@ -9,87 +9,41 @@ SECRET_KEY = 'django-insecure-g$1n#9%#q1(_a_!m_#e&j=js)zf-=e5a8m+(fa#l=z*9ro*-s4
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-DATABASES = {
-    'default':{
-        'ENGINE':'django.db.backends.sqlite3',
-         'NAME': BASE_DIR / 'db_prod.sqlite3'
-        
-    }
-}
-
-
-# DATABASES = {
-#         'default': {
-#             'ENGINE': 'djongo',
-#             'NAME': 'dga-staging',
-#             'ENFORCE_SCHEMA': False,
-#             'CLIENT': {
-#                 'host': os.environ.get('DBHOST'),
-#                 'port': 27017,
-#                 'username': 'dgatours',
-#                 'password': 'dgatours',
-#                 'authSource': 'dga-staging',
-#                 'authMechanism': 'SCRAM-SHA-1'
-#             },
-#             # 'LOGGING': {
-#             #     'version': 1,
-#             #     'loggers': {
-#             #         'djongo': {
-#             #             # 'level': 'INFO',
-#             #             # 'propagate': False,                        
-#             #         }
-#             #     },
-#             #  },
-#         }
-#     }
-
-# DATABASES = {
-#         'default': {
-#             'ENGINE': 'djongo',
-#             'NAME': os.environ.get('DBNAME'),
-#             'ENFORCE_SCHEMA': False,
-#             'CLIENT': {
-#                 'host': os.environ.get('DBHOST'),
-#                 'port': 27017,
-#                 'username': os.environ.get('DBUSER'),
-#                 'password': os.environ.get('DBPASS'),
-#                 'authSource': os.environ.get('DBNAME'),
-#                 'authMechanism': 'SCRAM-SHA-1'
-#             },
-#             # 'LOGGING': {
-#             #     'version': 1,
-#             #     'loggers': {
-#             #         'djongo': {
-#             #             # 'level': 'INFO',
-#             #             # 'propagate': False,                        
-#             #         }
-#             #     },
-#             #  },
-#         }
-#     }
-
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DBNAME'),
-#         'USER': os.environ.get('DBUSER'),
-#         'PASSWORD': os.environ.get('DBPASS'),
-#         'CONN_MAX_AGE': 1000,
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'd8bipld7hv4jjo',
+#         'USER': 'pqcwpbjatjxdjf',
+#         'PASSWORD': 'e4888706932d04a041656a840fab7671169720c234565ed269658aed01c178d8',
 #         'OPTIONS': {
-#             'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
+#             'options': '-c search_path=public'
 #         },
-#         'HOST': 'db',
-#         'PORT': int(os.environ.get('DBPORT')), #type: ignore
-#         'TEST': {
-#             'ENGINE': 'django.db.backends.postgresql',
-#             'NAME': os.environ.get('DBNAME'),
-#             'USER': os.environ.get('DBUSER'),
-#             'PASSWORD': os.environ.get('DBPASS'),
-#             'OPTIONS': {
-#                 'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
-#             },
-
-#         },
+#         'HOST': 'ec2-3-229-161-70.compute-1.amazonaws.com',
+#         'PORT': 5432
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get('DBNAME'),
+        'USER': os.environ.get('DBUSER'),
+        'PASSWORD': os.environ.get('DBPASS'),
+        'CONN_MAX_AGE': 1000,
+        'OPTIONS': {
+            'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
+        },
+        'HOST': 'db',
+        'PORT': int(os.environ.get('DBPORT')), #type: ignore
+        'TEST': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DBNAME'),
+            'USER': os.environ.get('DBUSER'),
+            'PASSWORD': os.environ.get('DBPASS'),
+            'OPTIONS': {
+                'options': '-c search_path={}'.format(os.environ.get('DBSCHEMA'))
+            },
+
+        },
+    }
+}
