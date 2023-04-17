@@ -24,9 +24,7 @@ deploy:
   image: registry.heroku.com/heroku-cli:latest
   stage: deploy
   script:
-    # - echo "$HEROKU_API_KEY" | docker login -u _ --password-stdin registry.heroku.com
-    - docker login -u _ -p "$HEROKU_API_KEY" registry.heroku.com
-    - heroku container:login
+    - docker login -u _ --password=$(heroku auth:token) registry.heroku.com
     - heroku container:push web --app $HEROKU_APP_NAME
     - heroku container:release web --app $HEROKU_APP_NAME
     - heroku run python manage.py migrate --app $HEROKU_APP_NAME
