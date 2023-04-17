@@ -41,6 +41,7 @@ migrate:
   script:
     - echo "Running migrations on Heroku..."
     - heroku run python manage.py migrate --app $HEROKU_APP_NAME
+  when: manual
   only:
     - main
     - staging
