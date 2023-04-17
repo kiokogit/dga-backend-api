@@ -16,8 +16,7 @@ build:
     - docker:dind
   script:
     - docker build --pull -t $HEROKU_APP_NAME -f Dockerfile .
-    # - docker login -u _ -p "$HEROKU_API_KEY" registry.heroku.com
-    - heroku container:login
+    - docker login -u _ -p "$HEROKU_API_KEY" registry.heroku.com
     - docker tag $HEROKU_APP_NAME registry.heroku.com/$HEROKU_APP_NAME/web
     - docker push registry.heroku.com/$HEROKU_APP_NAME/web
 
