@@ -162,12 +162,12 @@ class LoginUser(ViewSet):
             user.is_active = True
             user.save()
 
-        SendNotification(
-            receivers=[user],
-            sender='SYSTEM',
-            message=f"Hello! Welcome to DGA Staff Portal. By this first Login, your account has been successfully verified. You may now serve this great nation with pride. Bravo", # type:ignore
-            subject='First Time Login'
-        ).send_notification()
+            SendNotification(
+                receivers=[user],
+                sender='SYSTEM',
+                message=f"Hello! Welcome to DGA Staff Portal. By this first Login, your account has been successfully verified. You may now serve this great nation with pride. Bravo", # type:ignore
+                subject='First Time Login'
+            ).send_notification()
 
 
         payload = {
