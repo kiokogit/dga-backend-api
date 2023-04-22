@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'authapp',
     'packages_service',
     'usermanagement',
-    'shared_utils'
+    'shared_utils',
+    'analytics'
 ]
 
 MIDDLEWARE = [

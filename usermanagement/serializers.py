@@ -10,6 +10,9 @@ class PublicUserBasicDetails(serializers.ModelSerializer):
                 "email",
                 "last_name",
                 "middle_name",
+                "is_active",
+                "is_deleted",
+                "is_email_verified",
             ]
 
 class PublicUserDetailsSerializer(PublicUserBasicDetails):
