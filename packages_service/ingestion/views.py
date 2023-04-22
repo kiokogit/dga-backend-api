@@ -3,6 +3,8 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 
+from usermanagement.views import GeneralView
+
 from .serializers import CreatePackageBaseSerializer, CreatePackageValidateSerializer, EditPackageSerializer
 from .utils import BookingPermission, SMTPermission
 from shared_utils import utils
@@ -18,7 +20,7 @@ import re
 # Create your views here.
 
 
-class CreateTravelPackage(GenericViewSet):
+class CreateTravelPackage(GeneralView):
     # permission_classes = [BookingPermission, SMTPermission ]
 
     @action(detail=False, methods=['POST'])
@@ -62,11 +64,20 @@ class CreateTravelPackage(GenericViewSet):
 
         if pack.is_active:
             pack.is_active = False
+            activity = 'DEACTIVATED'
         else:
             pack.is_active = True
+            activity = 'ACTIVATED'
         pack.is_deleted = False
         pack.date_deleted = None
         pack.save()
+
+        utils.SendNotification(
+            receivers=[self.get_logged_in_user(self.request)],
+            sender='SYSTEM',
+            message=f"You have successfully {activity.lower()} Travel package reference number: {pack.reference_number}, title: {pack.title}.",
+            subject='Package Activation/Deactivation'
+        ).send_notification()
 
         return Response({"details":"Package successfully Updated"}, status=status.HTTP_200_OK)
 

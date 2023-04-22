@@ -2,7 +2,7 @@ import datetime
 from rest_framework import serializers
 from django.db import transaction
 
-from shared_utils.utils import generate_package_ref
+from shared_utils.utils import SendNotification, generate_package_ref
 from .. import models as package_models
 
 
@@ -108,6 +108,15 @@ class CreatePackageValidateSerializer(CreatePackageBaseSerializer):
                 ) for i in validated_data['price']
             ]
 
+        # send notification
+        SendNotification(
+            receivers=[self.context['user_id']],
+            sender='SYSTEM',
+            message=f"You have added a new package into the system, Reference Number: {reference_number}, title: {validated_data['package']['title']}. This package is however not yet active. Proceed to packages editing tab to activate.",
+            subject='New Package Added'
+        ).send_notification()
+            
+
         return validated_data
 
 
@@ -156,7 +165,13 @@ class EditPackageSerializer(serializers.Serializer):
                     id=package_instance.first().package_id  # type:ignore
                     **i
                 )
-            
+          # send notification
+        SendNotification(
+            receivers=[self.context['user_id']],
+            sender='SYSTEM',
+            message=f"You have Successfully Edited Travel package reference number: {package_instance.first().reference_number}, title: {package_instance.first().title}.", # type:ignore
+            subject='Package Editing'
+        ).send_notification()
 
         return validated_data
 

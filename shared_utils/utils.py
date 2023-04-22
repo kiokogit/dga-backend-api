@@ -4,6 +4,7 @@ from django.conf import settings
 import jwt
 
 from authapp.models import RolesModel, UserModel
+from shared_utils.models import NotificationsModel
 
 
 def return_headers(request):
@@ -133,4 +134,35 @@ def get_user_by_id(id):
     except UserModel.DoesNotExist:
         return None
     return user
+
+
+class SendNotification:
+
+    def __init__(self, receivers:list, sender, message, subject) -> None:
+        self.receivers = receivers
+        self.sender = sender
+        self.message = message
+        self.subject = subject
+
+    def send_notification(self):
+
+        try:
+
+            [
+                NotificationsModel.objects.create(
+                receiver=receiver,
+                sender=self.sender,
+                message=self.message,
+                subject=self.subject
+            ) for receiver in self.receivers
+
+            ]
+        except Exception as e:
+            print(e)
+            return False
+        # todo: send to emails
+        return True
+
+
+
 

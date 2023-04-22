@@ -1,4 +1,4 @@
-from shared_utils.utils import format_error
+from shared_utils.utils import SendNotification, format_error
 from .models import UserModel
 from . import serializers
 from app import settings
@@ -158,10 +158,17 @@ class LoginUser(ViewSet):
         token = Token.objects.filter(user=user).first()
         if not token:
             token = Token.objects.create(user=user)
-        else:
             user.is_email_verified = True
             user.is_active = True
             user.save()
+
+        SendNotification(
+            receivers=[user],
+            sender='SYSTEM',
+            message=f"Hello! Welcome to DGA Staff Portal. By this first Login, your account has been successfully verified. You may now serve this great nation with pride. Bravo", # type:ignore
+            subject='First Time Login'
+        ).send_notification()
+
 
         payload = {
             "user_id": str(user.id),
