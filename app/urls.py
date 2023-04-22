@@ -21,5 +21,6 @@ urlpatterns = [
     path('auth/', include('authapp.urls')),
     path('user/', include('usermanagement.urls')),
     path('packages/', include('packages_service.urls')),
-    path('utils/', include('shared_utils.urls'))
+    path('utils/', include('shared_utils.urls')),
+    path('analytics/', include('analytics.urls'))
 ]

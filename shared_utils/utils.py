@@ -126,3 +126,11 @@ def format_error(errors_):
             break
         return error_message
     return ''
+
+def get_user_by_id(id):
+    try:
+        user = UserModel.objects.get(id=id)
+    except UserModel.DoesNotExist:
+        return None
+    return user
+

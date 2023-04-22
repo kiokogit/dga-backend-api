@@ -129,4 +129,14 @@ class GeneralAccountsView(GeneralView):
 
         return Response(serializer.data)
 
+    @action(detail=False, methods=['GET'])
+    def get_all_staff_users(self, request):
+        users = UserModel.objects.all()
+
+        serializer = PublicUserBasicDetails(
+            users,
+            many=True
+        )
+        return Response(serializer.data)
+
     

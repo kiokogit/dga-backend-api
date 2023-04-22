@@ -2,6 +2,9 @@ import datetime
 from rest_framework import serializers
 from django.db import transaction
 
+from shared_utils.utils import get_user_by_id
+from usermanagement.serializers import PublicUserBasicDetails
+
 from . import models as package_models
 
 
@@ -138,3 +141,21 @@ class PackagesListStaffSerializer(serializers.ModelSerializer):
             'city_town',
             'country'
         ]
+
+class PackagesListByUploader(serializers.ModelSerializer):
+
+    class Meta:
+        model=package_models.PackageModel
+        fields=[
+            'title',
+            'cover_image',
+            'description',
+            'id',
+            'reference_number',
+            "is_active",
+            'city_town',
+            'country',
+            'created_by'
+        ]
+
+    
